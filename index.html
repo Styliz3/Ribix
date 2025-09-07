@@ -1,93 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>URL Shortener</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f1115;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    h1 {
-      color: #61dafb;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      background: #1a1d24;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    input {
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-      font-size: 14px;
-    }
-    button {
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #61dafb;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    button:hover {
-      background: #4fb3d9;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 16px;
-      color: #0ff;
-    }
-    a {
-      color: #0ff;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cookable — AI HTML5 App Creator</title>
+<meta name="description" content="Create HTML5 apps and sites by chatting with AI. Hosted on Vercel." />
+<link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <h1>🔗 URL Shortener</h1>
-  <form id="shortenForm">
-    <input type="url" id="longUrl" placeholder="Enter your long URL" required />
-    <input type="text" id="customAlias" placeholder="Custom alias (optional)" />
-    <button type="submit">Shorten</button>
-  </form>
-  <div id="result"></div>
+<main id="app">
+<!-- Landing -->
+<section id="landing" class="page page--active">
+<div class="hero">
+<h1 class="hero__title">Build something <span class="heart">❤</span> Cookable</h1>
+<p class="hero__subtitle">Create apps and websites by chatting with AI.</p>
+<form id="prompt-form" class="prompt">
+<input id="prompt-input" class="prompt__input" placeholder="Ask Cookable to create a landing page for my..." autocomplete="off" />
+<button class="prompt__send" title="Start" aria-label="Start">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-7z"/></svg>
+</button>
+</form>
+<div class="chips">
+<button class="chip" data-example="task tracker in vanilla js">Task tracker</button>
+<button class="chip" data-example="portfolio site with sections">Portfolio</button>
+<button class="chip" data-example="todo app with localstorage">Todo App</button>
+</div>
+<p class="hint">Deployed on Vercel · No signup required</p>
+</div>
+</section>
 
-  <script>
-    const form = document.getElementById("shortenForm");
-    const resultDiv = document.getElementById("result");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const longUrl = document.getElementById("longUrl").value;
-      const customAlias = document.getElementById("customAlias").value;
+<!-- Builder -->
+<section id="builder" class="page">
+<header class="bar">
+<button id="back-to-landing" class="btn btn--ghost">← Back</button>
+<div class="bar__title">Cookable Builder</div>
+<div class="bar__spacer"></div>
+</header>
 
-      const res = await fetch("/api/app", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ longUrl, customAlias }),
-      });
 
-      const data = await res.json();
-      if (data.shortUrl) {
-        resultDiv.innerHTML = `Shortened URL: <a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`;
-      } else {
-        resultDiv.textContent = "❌ Error: " + data.error;
-      }
-    });
-  </script>
+<div class="cols">
+<aside class="sidebar" id="file-list"></aside>
+<section class="chat" id="chat"></section>
+</div>
+
+
+<form id="continue-form" class="compose">
+<input id="continue-input" class="compose__input" placeholder="Continue prompting to edit files (e.g. 'Make buttons rounded', 'Add dark mode toggle')" />
+<button class="compose__send" title="Send" aria-label="Send">▶</button>
+</form>
+</section>
+
+
+<!-- Preview -->
+<section id="preview" class="page">
+<header class="bar">
+<button id="back-to-builder" class="btn btn--ghost">← Back</button>
+<div class="bar__title">Preview</div>
+<div class="bar__spacer"></div>
+<a id="download-zip" class="btn" download="cookable-app.html">Download</a>
+</header>
+<iframe id="preview-frame" title="Preview" sandbox="allow-forms allow-scripts allow-same-origin"></iframe>
+</section>
+</main>
+
+
+<script src="/cookable.js" type="module"></script>
 </body>
 </html>
