@@ -1,70 +1,101 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cookable — AI HTML5 App Creator</title>
-<meta name="description" content="Create HTML5 apps and sites by chatting with AI. Hosted on Vercel." />
-<link rel="stylesheet" href="/styles.css" />
+.chip:hover{border-color:#2e3750}
+.sheet .actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.8rem}
+
+
+/* Onboarding strip */
+.welcome{display:none;gap:.6rem;align-items:center;background:linear-gradient(90deg,rgba(124,157,255,.15),transparent);border:1px dashed #2b3350;border-radius:.6rem;padding:.6rem .8rem;margin-left:.5rem}
+
+
+@media (max-width: 900px){
+.page{width:100%;border-radius:0;border-left:0;border-right:0}
+.toolbar{top:40px;}
+}
+</style>
 </head>
 <body>
-<main id="app">
-<!-- Landing -->
-<section id="landing" class="page page--active">
-<div class="hero">
-<h1 class="hero__title">Build something <span class="heart">❤</span> Cookable</h1>
-<p class="hero__subtitle">Create apps and websites by chatting with AI.</p>
-<form id="prompt-form" class="prompt">
-<input id="prompt-input" class="prompt__input" placeholder="Ask Cookable to create a landing page for my..." autocomplete="off" />
-<button class="prompt__send" title="Start" aria-label="Start">
-<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-7z"/></svg>
-</button>
-</form>
-<div class="chips">
-<button class="chip" data-example="task tracker in vanilla js">Task tracker</button>
-<button class="chip" data-example="portfolio site with sections">Portfolio</button>
-<button class="chip" data-example="todo app with localstorage">Todo App</button>
-</div>
-<p class="hint">Deployed on Vercel · No signup required</p>
-</div>
-</section>
-
-
-<!-- Builder -->
-<section id="builder" class="page">
-<header class="bar">
-<button id="back-to-landing" class="btn btn--ghost">← Back</button>
-<div class="bar__title">Cookable Builder</div>
-<div class="bar__spacer"></div>
-</header>
-
-
-<div class="cols">
-<aside class="sidebar" id="file-list"></aside>
-<section class="chat" id="chat"></section>
+<div class="topbar">
+<div class="logo"><div class="logo-mark"></div><span>DoAI</span></div>
+<input id="docTitle" class="doc-title" value="Untitled" />
+<div class="welcome" id="welcomeStrip"></div>
+<div class="spacer"></div>
+<button class="btn" id="aiPanelBtn" title="Open AI Tools">⚡ AI Tools</button>
+<button class="btn" id="exportBtn" title="Download as .docx (HTML)">⬇️ Export</button>
+<span class="status" id="saveStatus">Saved</span>
 </div>
 
 
-<form id="continue-form" class="compose">
-<input id="continue-input" class="compose__input" placeholder="Continue prompting to edit files (e.g. 'Make buttons rounded', 'Add dark mode toggle')" />
-<button class="compose__send" title="Send" aria-label="Send">▶</button>
-</form>
-</section>
+<div class="toolbar" id="toolbar">
+<div class="group">
+<button class="tool" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+<button class="tool" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+<button class="tool" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+<div class="hr"></div>
+<button class="tool" data-cmd="insertUnorderedList" title="Bulleted list">• List</button>
+<button class="tool" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+<div class="hr"></div>
+<button class="tool" data-cmd="justifyLeft" title="Align left">⟸</button>
+<button class="tool" data-cmd="justifyCenter" title="Align center">↔</button>
+<button class="tool" data-cmd="justifyRight" title="Align right">⟹</button>
+<div class="hr"></div>
+<button class="tool" id="h1Btn" title="Heading 1">H1</button>
+<button class="tool" id="h2Btn" title="Heading 2">H2</button>
+<button class="tool" id="clearFmt" title="Clear formatting">🧽</button>
+</div>
+<div class="group">
+<button class="tool" id="aiRewrite">Rewrite</button>
+<button class="tool" id="aiShorten">Shorten</button>
+<button class="tool" id="aiExtend">Extend</button>
+<button class="tool" id="aiFix">Fix grammar</button>
+<button class="tool" id="aiTone">Change tone</button>
+<button class="tool" id="aiBullets">To bullets</button>
+<button class="tool" id="aiSummarize">Summarize</button>
+</div>
+</div>
 
 
-<!-- Preview -->
-<section id="preview" class="page">
-<header class="bar">
-<button id="back-to-builder" class="btn btn--ghost">← Back</button>
-<div class="bar__title">Preview</div>
-<div class="bar__spacer"></div>
-<a id="download-zip" class="btn" download="cookable-app.html">Download</a>
-</header>
-<iframe id="preview-frame" title="Preview" sandbox="allow-forms allow-scripts allow-same-origin"></iframe>
-</section>
-</main>
+<div class="page-wrap">
+<div class="page">
+<div id="editor" class="editor" contenteditable="true" data-placeholder="Start typing…"></div>
+</div>
+</div>
 
 
-<script src="/cookable.js" type="module"></script>
+<!-- Custom context menu -->
+<div class="ctx" id="contextMenu">
+<div class="item" data-action="ai">⚡ Ask DoAI about selection…</div>
+<div class="item" data-action="copy">📋 Copy</div>
+<div class="item" data-action="cut">✂️ Cut</div>
+<div class="item" data-action="paste">📥 Paste</div>
+</div>
+
+
+<!-- AI Modal -->
+<div class="modal" id="aiModal">
+<div class="sheet">
+<h3>Ask DoAI</h3>
+<p id="aiLead">Okay, you're working with selected text. What should I do?</p>
+<div class="chips" id="quickChips">
+<div class="chip" data-template="Rewrite the selection more professionally.">Professional rewrite</div>
+<div class="chip" data-template="Summarize the selection in 3 bullet points.">3‑bullet summary</div>
+<div class="chip" data-template="Translate the selection to {lang}.">Translate</div>
+<div class="chip" data-template="Expand the selection with relevant details.">Expand</div>
+<div class="chip" data-template="Fix spelling and grammar, keep meaning.">Fix grammar</div>
+</div>
+<div class="row"><textarea id="aiPrompt" rows="4" class="inp" placeholder="Describe what you want done…"></textarea></div>
+<div class="row">
+<input id="userName" class="inp" placeholder="Your name" />
+<input id="apiKey" class="inp" placeholder="Groq API key (stored locally)" />
+</div>
+<div class="actions">
+<button class="btn" id="aiCancel">Cancel</button>
+<button class="btn" id="aiRun">Run</button>
+</div>
+<p class="status" id="aiStatus"></p>
+</div>
+</div>
+
+
+<script src="./app.js"></script>
 </body>
 </html>
