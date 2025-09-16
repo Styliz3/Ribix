@@ -1,444 +1,154 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PartyLinks — Create & share custom message links 🎉</title>
-<meta name="description" content="Create custom shareable message links (expire in 1 hour). Optional analytics webhook for global visit tracking." />
-
-<!-- Default Open Graph (static preview used by Discord/X/Telegram when link is pasted) -->
-<meta property="og:type" content="website" />
-<meta property="og:site_name" content="PartyLinks" />
-<meta property="og:title" content="🎉 PartyLinks — Custom Message Link" />
-<meta property="og:description" content="Create custom message links with emojis. Links expire after 1 hour." />
-<meta property="og:image" content="https://dummyimage.com/1200x630/00ff90/001100.png&text=PartyLinks+%F0%9F%8E%89" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta name="twitter:card" content="summary_large_image"/>
-
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PartyLinks — Create & Share</title>
+<meta name="description" content="Create a custom message link that shows a clean showcase page. Links expire after 1 hour.">
+<!-- Static OG preview (used by Discord/X): customize image if you like -->
+<meta property="og:title" content="🎉 PartyLinks — Custom Message" />
+<meta property="og:description" content="Create a short custom message link — expires after 1 hour." />
+<meta property="og:image" content="https://dummyimage.com/1200x630/00ff90/001100.png&text=PartyLinks" />
+<meta name="twitter:card" content="summary_large_image" />
 <style>
-  :root{
-    --bg1: #071217; --bg2:#0e1416; --card:#0e1315; --accent:#00d084; --muted:#90a0ad;
-    --glass: rgba(255,255,255,0.03);
-  }
+  :root{--bg:#081016;--card:#0f1416;--muted:#9bb0b0;--accent:#00d084}
   *{box-sizing:border-box}
-  body{
-    margin:0;
-    min-height:100vh;
-    font-family:Inter, "Segoe UI", system-ui, -apple-system, Roboto, Arial;
-    background: linear-gradient(180deg,var(--bg1),var(--bg2));
-    color: #e8f6ef;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:28px;
-  }
-
-  .wrap{
-    width:100%;
-    max-width:1100px;
-    display:grid;
-    grid-template-columns: 1fr 420px;
-    gap:28px;
-    align-items:start;
-  }
-
-  .card{
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:14px;
-    padding:22px;
-    border:1px solid rgba(255,255,255,0.03);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
-  }
-
-  header.brand{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-  .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#002b1a,#003f22);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800}
-  h1{margin:0;font-size:20px}
-  p.lead{margin:4px 0 12px;color:var(--muted);font-size:13px}
-
-  /* FORM */
-  .big-input{display:flex;gap:12px;align-items:center}
-  .big-input input[type="text"]{
-    flex:1;padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);
-    background:var(--glass); color: #eafff0; font-size:15px;
-  }
-  .big-input button{
-    padding:12px 16px;border-radius:10px;border:none;background:linear-gradient(180deg,var(--accent),#00b26a);
-    color:#001a12;font-weight:800;cursor:pointer;
-  }
-  .hint{font-size:13px;color:var(--muted);margin-top:8px}
-
-  /* RECENT LINKS LIST */
-  .links-list{margin-top:18px;display:flex;flex-direction:column;gap:10px}
-  .link-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
-  .link-row .meta{flex:1;font-size:14px}
-  .link-row .meta .msg{font-weight:700;color:#eafff0}
-  .link-row .meta .time{font-size:12px;color:var(--muted)}
-  .link-row button{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent);padding:6px 8px;border-radius:8px;cursor:pointer}
-
-  /* RIGHT COLUMN - preview / showcase */
-  .preview{
-    display:flex;flex-direction:column;align-items:center;gap:14px;
-  }
-  .preview-card{
-    width:100%;
-    border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-    border:1px solid rgba(255,255,255,0.03);
-    text-align:center;
-  }
-  .big-msg{font-size:20px;font-weight:800;color:#0a1611}
-  .big-msg-wrap{background:#e6fff4;padding:14px;border-radius:10px;display:inline-block}
-
-  .meta-row{display:flex;gap:12px;align-items:center}
-  .avatar{width:72px;height:72px;border-radius:10px;background:#0b0f10;overflow:hidden}
-  .avatar img{width:100%;height:100%;object-fit:cover}
-
-  .status{font-size:13px;color:var(--muted)}
-  .small{font-size:13px;color:var(--muted)}
-
-  /* expired badge */
-  .badge-expired{background:#2b2b2b;color:#ffb3b3;padding:6px 8px;border-radius:8px;font-weight:700}
-  .badge-live{background:#052616;color:#d7ffef;padding:6px 8px;border-radius:8px;font-weight:700}
-
-  /* responsive */
-  @media (max-width:980px){
-    .wrap{grid-template-columns:1fr}
-  }
-
-  /* subtle confetti-ish decorative */
-  .deco{
-    position: absolute;right:18px;top:18px;font-size:12px;color:rgba(255,255,255,0.06)
-  }
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto;min-height:100vh;background:linear-gradient(180deg,var(--bg),#071018);color:#eaf8f0;display:flex;align-items:center;justify-content:center;padding:20px}
+  .wrap{width:100%;max-width:900px;display:grid;grid-template-columns:1fr 360px;gap:20px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  h1{margin:0 0 8px;color:var(--accent)}
+  .input-row{display:flex;gap:10px}
+  input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.02);color:inherit}
+  button{padding:10px 12px;border-radius:10px;border:none;background:var(--accent);color:#002218;font-weight:700;cursor:pointer}
+  .links{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .link-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:14px}
+  .preview{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+  .avatar{width:120px;height:120px;border-radius:12px;overflow:hidden;background:#081014;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .msg{background:#e6fff4;color:#042016;padding:12px;border-radius:10px;font-weight:800;display:inline-block;max-width:100%;word-break:break-word}
+  .small{color:var(--muted);font-size:13px}
+  .badge{padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.3);font-weight:700}
+  @media (max-width:900px){.wrap{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- LEFT: create + recent -->
+    <!-- Left: Creator -->
     <div class="card">
-      <header class="brand">
-        <div class="logo">PL</div>
-        <div>
-          <h1>PartyLinks</h1>
-          <div class="hint">Create a custom shareable message link. Links auto-expire after 1 hour.</div>
-        </div>
-      </header>
-
-      <div>
-        <label for="msgInput" style="font-weight:700">Your message</label>
-        <div style="height:10px"></div>
-        <div class="big-input">
-          <input id="msgInput" type="text" placeholder="Type any message (e.g. 'Alex is awesome 🎉')" maxlength="240" />
-          <button id="createBtn">Create</button>
-        </div>
-        <div class="hint">Links last 1 hour. Your created links are saved locally on this device.</div>
-
-        <div style="height:14px"></div>
-
-        <label for="analytics" style="font-weight:700">Optional analytics webhook (for global visit tracking)</label>
-        <input id="analytics" type="text" placeholder="https://your-server-or-webhook.site/receive" />
-        <div class="hint">If you provide a webhook URL, the page will POST a small JSON when any visitor opens the shared link (use your own server or testing webhook).</div>
+      <h1>PartyLinks</h1>
+      <div class="small">Create a short custom message and get a shareable showdown page. Links expire after 1 hour.</div>
+      <div style="height:12px"></div>
+      <div class="input-row">
+        <input id="msg" placeholder="Type message (e.g. 'Alex is awesome 🎉')" maxlength="220">
+        <button id="create">Create</button>
       </div>
-
-      <div style="margin-top:18px">
-        <h3 style="margin:0 0 8px">Your recent links</h3>
-        <div class="links-list" id="linksList">
-          <div class="small" id="noLinks">You haven't created any links yet.</div>
-        </div>
-      </div>
-
-      <div style="margin-top:18px;font-size:13px;color:var(--muted)">
-        Note: without a server the site uses localStorage for your links and per-browser visit counters. For centralized tracking and server-side deletion, you can plug in a small server endpoint.
-      </div>
+      <div style="height:10px"></div>
+      <div class="small">Your recent links (saved in this browser)</div>
+      <div class="links" id="recentList"><div class="small" id="none">No links yet.</div></div>
     </div>
 
-    <!-- RIGHT: showcase -->
-    <div class="card preview">
-      <div class="preview-card" id="previewCard">
-        <div class="meta-row" style="width:100%;justify-content:center">
-          <div class="avatar" id="previewAvatar"><img id="previewAvatarImg" src="https://dummyimage.com/150x150/0b0f10/ffffff.png&text=:-)"></div>
-        </div>
-
-        <div style="height:6px"></div>
-
-        <div id="previewMain">
-          <div class="status small" id="previewTime">No active link — create one on the left.</div>
-          <div style="height:8px"></div>
-          <div class="big-msg-wrap" id="previewMsgWrap"><div class="big-msg" id="previewMsg">Share something fun!</div></div>
-          <div style="height:10px"></div>
-          <div class="small">Views: <span id="previewViews">0</span></div>
-          <div style="height:8px"></div>
-          <div id="previewBadge" class="badge-live" style="display:none">Active</div>
-          <div id="previewExpired" class="badge-expired" style="display:none">Expired / Deleted</div>
+    <!-- Right: Preview / Showcase -->
+    <div class="card preview" id="previewCard">
+      <div id="showMode">
+        <div class="avatar" id="avatar"><span id="avatarText">PL</span></div>
+        <div class="small" id="metaText">No active link</div>
+        <div class="msg" id="bigMsg">Create a link to see the showcase here.</div>
+        <div class="small">Views: <span id="views">0</span></div>
+        <div style="height:8px"></div>
+        <div style="display:flex;gap:8px">
+          <button id="openCreate" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent)">Create your own</button>
+          <div class="badge" id="statusBadge" style="display:none"></div>
         </div>
       </div>
     </div>
-
   </div>
 
 <script>
-/*
-  PartyLinks single-file app
-  - Creates share links that encode message + creation timestamp + id in query
-  - Links expire after 1 hour (3600 seconds)
-  - Creator's recent links stored locally in localStorage under key 'pl_links'
-  - Visit counts stored in localStorage per link id for viewer-side counts
-  - Optional analytics: user can set a webhook; when a link is opened the page will POST visit info to that URL (if provided)
-  - NOTE: For true global visit counts and server-side deletion, you need a server endpoint. This file keeps everything client-only.
+/* Minimal client-only PartyLinks:
+   - create encoded link: ?d=BASE64(JSON{id,msg,ts})
+   - store creator's recent links in localStorage
+   - when opening a link, decode, increment viewer-side count (localStorage), show showcase
+   - no webhooks, no server
 */
+const KEY='pl_links_v2', VIEWP='pl_views_v2_'; const EX=3600;
+const el={msg:qs('#msg'),create:qs('#create'),recent:qs('#recentList'),none:qs('#none'),
+  avatar:qs('#avatar'),avatarText:qs('#avatarText'),meta:qs('#metaText'),bigMsg:qs('#bigMsg'),
+  views:qs('#views'),openCreate:qs('#openCreate'),status:qs('#statusBadge')};
 
-// constants
-const STORAGE_KEY = 'pl_links_v1'; // stores array of {id,msg,ts}
-const VIEW_PREFIX = 'pl_views_v1_'; // per-link viewer counter key prefix
-const EXPIRE_SECONDS = 3600; // 1 hour
+function qs(s){return document.querySelector(s)}
+function uid(n=8){const a='abcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<n;i++)r+=a[Math.floor(Math.random()*a.length)];return r}
+function now(){return Math.floor(Date.now()/1000)}
+function save(a){localStorage.setItem(KEY,JSON.stringify(a))}
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+function b64enc(o){return btoa(encodeURIComponent(JSON.stringify(o)))}
+function b64dec(s){try{return JSON.parse(decodeURIComponent(atob(s)))}catch(e){return null}}
 
-// DOM refs
-const msgInput = document.getElementById('msgInput');
-const createBtn = document.getElementById('createBtn');
-const linksList = document.getElementById('linksList');
-const noLinks = document.getElementById('noLinks');
-const analyticsInput = document.getElementById('analytics');
-
-const previewMsg = document.getElementById('previewMsg');
-const previewViews = document.getElementById('previewViews');
-const previewTime = document.getElementById('previewTime');
-const previewBadge = document.getElementById('previewBadge');
-const previewExpired = document.getElementById('previewExpired');
-const previewAvatarImg = document.getElementById('previewAvatarImg');
-const previewMsgWrap = document.getElementById('previewMsgWrap');
-
-// utils
-function uid(len=8){
-  const s = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let r='';
-  for(let i=0;i<len;i++) r += s[Math.floor(Math.random()*s.length)];
-  return r;
-}
-function nowSec(){ return Math.floor(Date.now()/1000); }
-
-function saveLinks(arr){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr || []));
-}
-function loadLinks(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){ return []; }
-}
-
-// create encoded link: we'll use base64 of JSON in query param 'd'
-// structure: {id,msg,ts}
-function makeLinkObj(msg){
-  const obj = { id: uid(9), msg: msg.slice(0,240), ts: nowSec() };
-  return obj;
-}
-function encodeLinkObj(o){
-  const s = JSON.stringify(o);
-  return btoa(encodeURIComponent(s));
-}
-function decodeLinkObj(encoded){
-  try{
-    const s = decodeURIComponent(atob(encoded));
-    return JSON.parse(s);
-  }catch(e){ return null; }
-}
-function makeShareURL(o){
-  return `${location.origin}${location.pathname}?d=${encodeLinkObj(o)}`;
-}
-
-// rendering user's recent links (only saved locally on creator device)
-function renderLinksList(){
-  const arr = loadLinks().slice().reverse();
-  linksList.innerHTML = '';
-  if(arr.length === 0){
-    noLinks.style.display = 'block';
-    return;
+function makeURL(obj){return location.origin+location.pathname+'?d='+b64enc(obj)}
+function renderRecent(){
+  const arr=load().slice().reverse(); el.recent.innerHTML=''; if(arr.length===0){el.none.style.display='block'; return;} el.none.style.display='none';
+  for(const it of arr){
+    const row=document.createElement('div'); row.className='link-item';
+    const left=document.createElement('div'); left.innerHTML=`<div style="font-weight:700">${escapeHtml(it.msg)}</div><div class="small">${formatAge(it.ts)}</div>`;
+    const right=document.createElement('div');
+    const cp=document.createElement('button'); cp.textContent='Copy'; cp.onclick=()=>{navigator.clipboard?.writeText(makeURL(it)); cp.textContent='Copied'; setTimeout(()=>cp.textContent='Copy',900)}
+    const del=document.createElement('button'); del.textContent='Remove'; del.onclick=()=>{ const a=load().filter(x=>x.id!==it.id); save(a); renderRecent(); }
+    right.appendChild(cp); right.appendChild(del);
+    row.appendChild(left); row.appendChild(right); el.recent.appendChild(row);
   }
-  noLinks.style.display = 'none';
-  arr.forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'link-row';
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    const msgEl = document.createElement('div');
-    msgEl.className = 'msg';
-    msgEl.textContent = item.msg;
-    const timeEl = document.createElement('div');
-    timeEl.className = 'time';
-    const age = nowSec() - item.ts;
-    if(age >= EXPIRE_SECONDS){
-      timeEl.textContent = `Expired ${Math.floor(age/60)}m ago`;
-    } else {
-      const rem = EXPIRE_SECONDS - age;
-      timeEl.textContent = `Expires in ${Math.floor(rem/60)}m ${rem%60}s`;
-    }
-    meta.appendChild(msgEl);
-    meta.appendChild(timeEl);
-    const btnWrap = document.createElement('div');
-    btnWrap.style.display = 'flex';
-    btnWrap.style.gap = '8px';
-    // copy link button
-    const linkBtn = document.createElement('button');
-    linkBtn.textContent = 'Copy link';
-    linkBtn.onclick = () => {
-      const url = makeShareURL(item);
-      navigator.clipboard?.writeText(url).then(()=> {
-        linkBtn.textContent = 'Copied!';
-        setTimeout(()=> linkBtn.textContent = 'Copy link',1200);
-      }).catch(()=> alert('Copy failed — open link and copy manually.'));
-    };
-    // delete local button
-    const delBtn = document.createElement('button');
-    delBtn.textContent = 'Remove';
-    delBtn.onclick = () => {
-      const arr2 = loadLinks().filter(x=> x.id !== item.id);
-      saveLinks(arr2);
-      renderLinksList();
-    };
-    btnWrap.appendChild(linkBtn);
-    btnWrap.appendChild(delBtn);
-    el.appendChild(meta);
-    el.appendChild(btnWrap);
-    linksList.appendChild(el);
-  });
 }
 
-// handle create
-createBtn.addEventListener('click', () => {
-  const text = msgInput.value.trim();
-  if(!text) return alert('Type a message to share.');
-  const obj = makeLinkObj(text);
-  // save to local
-  const arr = loadLinks();
-  arr.push(obj);
-  saveLinks(arr);
-  renderLinksList();
-  // show preview for this link
-  const url = makeShareURL(obj);
-  // copy to clipboard
-  navigator.clipboard?.writeText(url).catch(()=>{});
-  // open the link in new tab (optional) — here we just update preview panel
-  showPreviewFor(obj);
-  // notify UX
-  createBtn.textContent = 'Created!';
-  setTimeout(()=> createBtn.textContent = 'Create', 900);
-  msgInput.value = '';
+function formatAge(ts){const age=now()-ts; if(age>EX) return `Expired ${Math.floor(age/60)}m ago`; const rem=EX-age; return `Expires in ${Math.floor(rem/60)}m ${rem%60}s`}
+
+function escapeHtml(s){return s.replace(/[&<>"']/g,ch=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[ch])}
+
+el.create.addEventListener('click', ()=>{
+  const txt=(el.msg.value||'').trim(); if(!txt) return alert('Type a message');
+  const obj={id:uid(9),msg:txt,ts:now()};
+  const arr=load(); arr.push(obj); save(arr); renderRecent();
+  // show preview + copy url
+  showFor(obj); navigator.clipboard?.writeText(makeURL(obj)).catch(()=>{});
+  el.msg.value=''; el.create.textContent='Created'; setTimeout(()=>el.create.textContent='Create',800);
 });
 
-// show preview of link object on right column (preview card)
-function showPreviewFor(obj){
-  const age = nowSec() - obj.ts;
-  previewMsg.textContent = obj.msg;
-  previewMsgWrap.style.background = age >= EXPIRE_SECONDS ? '#efe7e7' : '#e6fff4';
-  previewMsg.style.color = age >= EXPIRE_SECONDS ? '#601111' : '#0a1611';
-  previewTime.textContent = (age>=EXPIRE_SECONDS) ? `Created ${Math.floor(age/60)}m ago (expired)` : `Created just now • expires in ${Math.floor((EXPIRE_SECONDS - age)/60)}m`;
-  if(age >= EXPIRE_SECONDS){
-    previewBadge.style.display = 'none';
-    previewExpired.style.display = 'inline-block';
-  } else {
-    previewBadge.style.display = 'inline-block';
-    previewExpired.style.display = 'none';
-  }
-  // show stored view count (viewer-side)
-  const vKey = VIEW_PREFIX + obj.id;
-  const curViews = parseInt(localStorage.getItem(vKey) || '0', 10);
-  previewViews.textContent = curViews;
-  // avatar: show generated visual using initials via dummyimage (no user avatars; message may include @username)
-  const initials = getInitialsFromMsg(obj.msg) || 'PL';
-  const bgHash = hashColor(obj.id);
-  const avatarUrl = `https://dummyimage.com/150x150/${bgHash}/ffffff.png&text=${encodeURIComponent(initials)}`;
-  previewAvatarImg.src = avatarUrl;
+el.openCreate.addEventListener('click', ()=>{ history.replaceState({},'',location.pathname); initHome() })
+
+// when opening a link ?d=...
+function handleIncoming(){
+  const p=new URLSearchParams(location.search);
+  if(!p.has('d')) return initHome();
+  const obj=b64dec(p.get('d')); if(!obj){ initHome(); return }
+  // increment viewer-side views
+  const vkey=VIEWP+obj.id; const prev=parseInt(localStorage.getItem(vkey)||'0',10); localStorage.setItem(vkey,String(prev+1));
+  // show showcase
+  showFor(obj);
 }
 
-// helper generate initials (from message, e.g. if message starts with '@Name', use that)
-function getInitialsFromMsg(msg){
-  // if starts with @username -> use that
-  const m = msg.trim();
-  if(m.startsWith('@')){
-    const part = m.slice(1).split(/\s+/)[0];
-    return part.slice(0,2).toUpperCase();
-  }
-  // otherwise use first two non-space chars
-  const letters = m.replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase();
-  return letters || 'PL';
-}
-function hashColor(s){
-  let h=0;
-  for(let i=0;i<s.length;i++) h = (h<<5) - h + s.charCodeAt(i);
-  h = Math.abs(h);
-  // produce hex like 00aabb
-  const r = (h & 0xFF0000) >> 16;
-  const g = (h & 0x00FF00) >> 8;
-  const b = (h & 0x0000FF);
-  const hex = ((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
-  return hex;
+function showFor(obj){
+  // update preview UI
+  const age=now()-obj.ts;
+  el.bigMsg.textContent=obj.msg;
+  el.meta.textContent = (age>EX) ? `Created ${Math.floor(age/60)}m ago — expired` : `Created just now • expires in ${Math.floor((EX-age)/60)}m`;
+  el.views.textContent = localStorage.getItem(VIEWP+obj.id)||'0';
+  el.avatarText.textContent = initialsFrom(obj.msg);
+  el.avatar.style.background = '#'+colorFrom(obj.id);
+  el.status.style.display='inline-block';
+  el.status.textContent = (age>EX)?'Expired':'Active';
+  // ensure preview is visible (it is), remove query if user clicks create
 }
 
-// when opening a shared link (?d=BASE64), decode and show
-function handleIncomingLink(){
-  const urlParams = new URLSearchParams(location.search);
-  if(!urlParams.has('d')) return;
-  const enc = urlParams.get('d');
-  const obj = decodeLinkObj(enc);
-  if(!obj){
-    previewMsg.textContent = 'Invalid link';
-    previewTime.textContent = '';
-    return;
-  }
-  const age = nowSec() - obj.ts;
-  // increment viewer-side view counter for this link id
-  const vKey = VIEW_PREFIX + obj.id;
-  const prev = parseInt(localStorage.getItem(vKey) || '0',10);
-  const next = prev + 1;
-  localStorage.setItem(vKey, String(next));
-  // optional analytics ping if creator included analytics webhook earlier on their machine:
-  // (we can't auto-read creator's localStorage from a different device, but user who created link could include analytics URL in the message location when creating)
-  // We support an optional 'h' param (analytics webhook) in the link: ?d=...&h=ENCODED_WEBHOOK
-  // If present, we attempt to POST visit details; cross-origin and CORS applies — webhook must accept CORS or allow POST from anywhere.
-  const webhook = urlParams.get('h');
-  if(webhook){
-    try{
-      fetch(webhook, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ event: 'visit', id: obj.id, msg: obj.msg, ts: nowSec(), url: location.href })
-      }).catch(()=>{/*ignore*/});
-    }catch(e){}
-  }
-  // render preview
-  showPreviewFor(obj);
-  // update preview views after increment
-  const updated = parseInt(localStorage.getItem(vKey) || '0',10);
-  previewViews.textContent = updated;
-  // If expired, show expired badge
-  if(age >= EXPIRE_SECONDS){
-    previewBadge.style.display = 'none';
-    previewExpired.style.display = 'inline-block';
-  } else {
-    previewBadge.style.display = 'inline-block';
-    previewExpired.style.display = 'none';
-  }
-  // UI: also show the link in the left Recent list if creator had it saved locally (optional)
+function initialsFrom(msg){
+  const t=msg.trim();
+  if(t.startsWith('@')){ const u=t.slice(1).split(/\s+/)[0]; return u.slice(0,2).toUpperCase(); }
+  const letters = t.replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase(); return letters||'PL';
+}
+function colorFrom(s){
+  let h=0; for(let i=0;i<s.length;i++) h=(h<<5)-h+s.charCodeAt(i); h=Math.abs(h);
+  const r=(h>>16)&255, g=(h>>8)&255, b=h&255; return [r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 
-// On load, render stored links
-renderLinksList();
-handleIncomingLink();
+function initHome(){ renderRecent(); el.bigMsg.textContent='Create a link to see the showcase here.'; el.meta.textContent='No active link'; el.views.textContent='0'; el.avatarText.textContent='PL'; el.avatar.style.background='#081014'; el.status.style.display='none' }
 
-// Also periodically update remaining times every 10s in the links list and preview
-setInterval(()=> {
-  // update links list times
-  const arr = loadLinks();
-  // update list by re-rendering (cheap)
-  renderLinksList();
-  // If preview is showing an encoded link, refresh the preview times
-  const urlParams = new URLSearchParams(location.search);
-  if(urlParams.has('d')){
-    const enc = urlParams.get('d');
-    const obj = decodeLinkObj(enc);
-    if(obj) showPreviewFor(obj);
-  }
-}, 10000);
-
+// bootstrap
+renderRecent(); handleIncoming();
 </script>
 </body>
 </html>
