@@ -1,92 +1,74 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>EmeraldPet — Free Pet Generator</title>
-<meta name="description" content="Generate your free Roblox pet instantly with EmeraldPet. Just enter your username!" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EmeraldPet — Roblox Pet Generator</title>
+<meta name="description" content="Generate your exclusive Roblox pet instantly with EmeraldPet. Looks official, totally free!">
 
-<!-- Default social embed -->
-<meta property="og:title" content="EmeraldPet — Free Pet Generator" />
-<meta property="og:description" content="Claim your exclusive Roblox pet now. Looks official, totally free." />
-<meta property="og:image" content="https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary_large_image" />
+<!-- Open Graph (Discord Embed) -->
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="EmeraldPet"/>
+<meta property="og:title" content="EmeraldPet — Free Roblox Pet Generator"/>
+<meta property="og:description" content="Claim your exclusive Roblox pet now. Official-looking, totally free."/>
+<meta property="og:image" content="https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png"/>
+<meta property="og:image:width" content="512"/>
+<meta property="og:image:height" content="512"/>
+<meta property="og:url" content="https://your-vercel-site.vercel.app/"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="EmeraldPet — Free Roblox Pet Generator"/>
+<meta name="twitter:description" content="Unlock your Roblox pet instantly. Looks official, totally free!"/>
+<meta name="twitter:image" content="https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png"/>
 
 <style>
-  body {
-    margin:0;
-    font-family: "Segoe UI", Tahoma, sans-serif;
-    background:#0d0f11;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    min-height:100vh;
-    padding:20px;
-  }
-  .card {
-    background:#15181c;
-    border-radius:12px;
-    padding:30px;
-    width:100%;
-    max-width:420px;
-    text-align:center;
-    box-shadow:0 6px 20px rgba(0,0,0,0.6);
-  }
-  h1 {margin:0 0 20px;font-size:20px;color:#00ff90;}
-  input {
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    margin-bottom:14px;
-    font-size:16px;
-  }
-  button {
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-    font-weight:bold;
-    cursor:pointer;
-    background:#00ff90;
-    color:#000;
-  }
-  .avatar {
-    margin:20px auto;
-    width:120px;height:120px;
-    border-radius:12px;
-    overflow:hidden;
-    background:#111;
-  }
-  .avatar img{width:100%;height:100%;object-fit:cover;}
-  .pet {margin-top:20px;}
-  .pet img{width:200px;border-radius:12px;}
-  .share {
-    margin-top:20px;
-    background:#222;
-    padding:10px;
-    border-radius:8px;
-    font-size:14px;
-    word-break:break-all;
-  }
+body {
+  margin:0;
+  font-family:"Segoe UI", Tahoma, sans-serif;
+  background:#0d0f11;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:20px;
+}
+.card {
+  background:#15181c;
+  border-radius:12px;
+  padding:30px;
+  max-width:440px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,0.6);
+}
+h1 {margin:0 0 15px;color:#00ff90;font-size:22px;}
+input,button {
+  width:100%;padding:12px;border-radius:8px;font-size:16px;margin-bottom:12px;border:none;
+}
+input{background:#1e2227;color:#fff;}
+button{background:#00ff90;color:#000;font-weight:bold;cursor:pointer;}
+.avatar{margin:20px auto;width:120px;height:120px;border-radius:12px;overflow:hidden;background:#111;}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.pet{margin-top:20px;}
+.pet img{width:200px;border-radius:12px;}
+.share{margin-top:20px;font-size:14px;background:#222;padding:10px;border-radius:8px;word-break:break-all;}
 </style>
 </head>
 <body>
-<div class="card" id="mainCard">
+<div class="card" id="generator">
   <h1>EmeraldPet Generator</h1>
   <div id="formArea">
-    <input id="username" placeholder="Enter Roblox username"/>
+    <input id="username" placeholder="Enter Roblox username">
     <button onclick="generate()">Generate Pet</button>
   </div>
   <div id="resultArea" style="display:none;">
-    <div class="avatar"><img id="avatarImg" src="" alt="avatar"/></div>
+    <div class="avatar"><img id="avatarImg" src="" alt="avatar"></div>
     <h2 id="displayName"></h2>
     <div class="pet">
-      <p>We generated you this:</p>
-      <img id="petImg" src="" alt="pet"/>
+      <p>You unlocked:</p>
+      <img id="petImg" src="">
       <h3 id="petName"></h3>
     </div>
     <div class="share">
@@ -96,51 +78,67 @@
   </div>
 </div>
 
+<div class="card" id="showcase" style="display:none;">
+  <div class="avatar"><img id="scAvatar" src=""></div>
+  <h2 id="scName"></h2>
+  <div class="pet">
+    <p>Unlocked pet:</p>
+    <img id="scPet" src="">
+    <h3 id="scPetName"></h3>
+  </div>
+</div>
+
 <script>
-const PETS = [
-  { src: 'https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png', name: 'Diamond Phantom Overseer' },
-  { src: 'https://etu-values.vercel.app/assets/pets/shiny-phantom-overseer.png', name: 'Shiny Phantom Overseer' },
-  { src: 'https://etu-values.vercel.app/assets/pets/shiny-sakura-tarragon.png', name: 'Shiny Sakura Tarragon' }
+const PETS=[
+ {src:"https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png",name:"Diamond Phantom Overseer"},
+ {src:"https://etu-values.vercel.app/assets/pets/shiny-phantom-overseer.png",name:"Shiny Phantom Overseer"},
+ {src:"https://etu-values.vercel.app/assets/pets/shiny-sakura-tarragon.png",name:"Shiny Sakura Tarragon"}
 ];
 
-// Handle query params (shared link)
-const params = new URLSearchParams(location.search);
-if(params.has("user") && params.has("pet")){
-  showResult(params.get("user"), params.get("pet"));
-}
-
-async function generate(){
-  const username = document.getElementById("username").value.trim();
-  if(!username) return alert("Enter a username!");
-  const pet = PETS[Math.floor(Math.random()*PETS.length)];
-  showResult(username, pet.src);
-}
-
-function showResult(username, petSrc){
-  document.getElementById("formArea").style.display="none";
-  const result = document.getElementById("resultArea");
-  result.style.display="block";
-
-  // profile
-  document.getElementById("displayName").textContent=username;
-  document.getElementById("avatarImg").src=
-    `https://www.roblox.com/headshot-thumbnail/image?username=${encodeURIComponent(username)}&width=150&height=150&format=png`;
-
-  // pet
-  const pet = PETS.find(p=>p.src===petSrc) || PETS[0];
-  document.getElementById("petImg").src=pet.src;
-  document.getElementById("petName").textContent=pet.name;
-
-  // share link
-  const url = `${location.origin}${location.pathname}?user=${encodeURIComponent(username)}&pet=${encodeURIComponent(pet.src)}`;
-  const link = document.getElementById("shareLink");
-  link.href=url;
-  link.textContent=url;
-
-  // update OG tags dynamically (for live preview, but Discord reads only from server render)
-  document.querySelector('meta[property="og:title"]').setAttribute("content", `${username} unlocked a pet on EmeraldPet!`);
-  document.querySelector('meta[property="og:description"]').setAttribute("content", `They got ${pet.name}. Generate yours now!`);
-  document.querySelector('meta[property="og:image"]').setAttribute("content", pet.src);
+// Showcase mode
+const params=new URLSearchParams(location.search);
+if(params.has("user")&&params.has("pet")){
+  document.getElementById("generator").style.display="none";
+  document.getElementById("showcase").style.display="block";
+  const user=params.get("user");
+  const pet=params.get("pet");
+  const petData=PETS.find(p=>p.src===pet)||PETS[0];
+  document.getElementById("scName").textContent=user;
+  document.getElementById("scPet").src=petData.src;
+  document.getElementById("scPetName").textContent=petData.name;
+  fetch("https://users.roblox.com/v1/usernames/users",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({usernames:[user]})
+  }).then(r=>r.json()).then(d=>{
+    if(d.data&&d.data[0]){
+      const id=d.data[0].id;
+      document.getElementById("scAvatar").src=`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
+    }
+  });
+}else{
+  window.generate=function(){
+    const username=document.getElementById("username").value.trim();
+    if(!username)return alert("Enter username");
+    const pet=PETS[Math.floor(Math.random()*PETS.length)];
+    document.getElementById("formArea").style.display="none";
+    document.getElementById("resultArea").style.display="block";
+    document.getElementById("displayName").textContent=username;
+    document.getElementById("petImg").src=pet.src;
+    document.getElementById("petName").textContent=pet.name;
+    fetch("https://users.roblox.com/v1/usernames/users",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({usernames:[username]})
+    }).then(r=>r.json()).then(d=>{
+      if(d.data&&d.data[0]){
+        const id=d.data[0].id;
+        document.getElementById("avatarImg").src=`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
+      }
+    });
+    const url=`${location.origin}${location.pathname}?user=${encodeURIComponent(username)}&pet=${encodeURIComponent(pet.src)}`;
+    const link=document.getElementById("shareLink");
+    link.href=url;
+    link.textContent=url;
+  }
 }
 </script>
 </body>
