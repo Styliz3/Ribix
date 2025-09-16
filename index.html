@@ -6,41 +6,23 @@
 <title>EmeraldPet — Roblox Pet Generator</title>
 <meta name="description" content="Generate your exclusive Roblox pet instantly with EmeraldPet. Looks official, totally free!">
 
-<!-- Open Graph (Discord Embed) -->
+<!-- OG/Twitter preview (static default) -->
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="EmeraldPet"/>
 <meta property="og:title" content="EmeraldPet — Free Roblox Pet Generator"/>
 <meta property="og:description" content="Claim your exclusive Roblox pet now. Official-looking, totally free."/>
 <meta property="og:image" content="https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png"/>
-<meta property="og:image:width" content="512"/>
-<meta property="og:image:height" content="512"/>
 <meta property="og:url" content="https://your-vercel-site.vercel.app/"/>
-
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="EmeraldPet — Free Roblox Pet Generator"/>
-<meta name="twitter:description" content="Unlock your Roblox pet instantly. Looks official, totally free!"/>
-<meta name="twitter:image" content="https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png"/>
 
 <style>
 body {
-  margin:0;
-  font-family:"Segoe UI", Tahoma, sans-serif;
-  background:#0d0f11;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:100vh;
-  padding:20px;
+  margin:0;font-family:"Segoe UI",sans-serif;background:#0d0f11;color:#fff;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;
 }
 .card {
-  background:#15181c;
-  border-radius:12px;
-  padding:30px;
-  max-width:440px;
-  width:100%;
-  text-align:center;
+  background:#15181c;border-radius:12px;padding:30px;
+  max-width:440px;width:100%;text-align:center;
   box-shadow:0 8px 24px rgba(0,0,0,0.6);
 }
 h1 {margin:0 0 15px;color:#00ff90;font-size:22px;}
@@ -49,11 +31,19 @@ input,button {
 }
 input{background:#1e2227;color:#fff;}
 button{background:#00ff90;color:#000;font-weight:bold;cursor:pointer;}
-.avatar{margin:20px auto;width:120px;height:120px;border-radius:12px;overflow:hidden;background:#111;}
-.avatar img{width:100%;height:100%;object-fit:cover;}
-.pet{margin-top:20px;}
-.pet img{width:200px;border-radius:12px;}
+.avatar{margin:20px auto;width:120px;height:120px;border-radius:12px;overflow:hidden;background:#111;position:relative;}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.pet{margin-top:20px;min-height:200px;position:relative;}
+.pet img{width:200px;border-radius:12px;animation:pop .4s ease;}
+@keyframes pop {0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
 .share{margin-top:20px;font-size:14px;background:#222;padding:10px;border-radius:8px;word-break:break-all;}
+
+/* Skeleton loading effect */
+.skeleton{background:linear-gradient(90deg,#222 25%,#333 37%,#222 63%);background-size:400% 100%;animation:skeleton 1.4s ease infinite;}
+@keyframes skeleton{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.loading-bar{height:10px;border-radius:6px;overflow:hidden;margin-top:15px;}
+.loading-fill{width:0%;height:100%;background:#00ff90;animation:fill 2s linear forwards;}
+@keyframes fill{from{width:0%}to{width:100%}}
 </style>
 </head>
 <body>
@@ -64,27 +54,16 @@ button{background:#00ff90;color:#000;font-weight:bold;cursor:pointer;}
     <button onclick="generate()">Generate Pet</button>
   </div>
   <div id="resultArea" style="display:none;">
-    <div class="avatar"><img id="avatarImg" src="" alt="avatar"></div>
+    <div class="avatar skeleton" id="avatarBox"></div>
     <h2 id="displayName"></h2>
-    <div class="pet">
-      <p>You unlocked:</p>
-      <img id="petImg" src="">
-      <h3 id="petName"></h3>
+    <div class="pet" id="petBox">
+      <div class="loading-bar"><div class="loading-fill"></div></div>
+      <p id="petStatus">Fetching your pet...</p>
     </div>
-    <div class="share">
+    <div class="share" id="shareBox" style="display:none;">
       <p>Share this link:</p>
       <a id="shareLink" href=""></a>
     </div>
-  </div>
-</div>
-
-<div class="card" id="showcase" style="display:none;">
-  <div class="avatar"><img id="scAvatar" src=""></div>
-  <h2 id="scName"></h2>
-  <div class="pet">
-    <p>Unlocked pet:</p>
-    <img id="scPet" src="">
-    <h3 id="scPetName"></h3>
   </div>
 </div>
 
@@ -95,50 +74,47 @@ const PETS=[
  {src:"https://etu-values.vercel.app/assets/pets/shiny-sakura-tarragon.png",name:"Shiny Sakura Tarragon"}
 ];
 
-// Showcase mode
-const params=new URLSearchParams(location.search);
-if(params.has("user")&&params.has("pet")){
-  document.getElementById("generator").style.display="none";
-  document.getElementById("showcase").style.display="block";
-  const user=params.get("user");
-  const pet=params.get("pet");
-  const petData=PETS.find(p=>p.src===pet)||PETS[0];
-  document.getElementById("scName").textContent=user;
-  document.getElementById("scPet").src=petData.src;
-  document.getElementById("scPetName").textContent=petData.name;
-  fetch("https://users.roblox.com/v1/usernames/users",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({usernames:[user]})
-  }).then(r=>r.json()).then(d=>{
-    if(d.data&&d.data[0]){
-      const id=d.data[0].id;
-      document.getElementById("scAvatar").src=`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
-    }
-  });
-}else{
-  window.generate=function(){
-    const username=document.getElementById("username").value.trim();
-    if(!username)return alert("Enter username");
-    const pet=PETS[Math.floor(Math.random()*PETS.length)];
-    document.getElementById("formArea").style.display="none";
-    document.getElementById("resultArea").style.display="block";
-    document.getElementById("displayName").textContent=username;
-    document.getElementById("petImg").src=pet.src;
-    document.getElementById("petName").textContent=pet.name;
-    fetch("https://users.roblox.com/v1/usernames/users",{
+async function generate(){
+  const username=document.getElementById("username").value.trim();
+  if(!username)return alert("Enter username");
+  document.getElementById("formArea").style.display="none";
+  document.getElementById("resultArea").style.display="block";
+  document.getElementById("displayName").textContent=username;
+  // random pet
+  const pet=PETS[Math.floor(Math.random()*PETS.length)];
+
+  // Step 1: load avatar reliably
+  try{
+    const res=await fetch("https://users.roblox.com/v1/usernames/users",{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({usernames:[username]})
-    }).then(r=>r.json()).then(d=>{
-      if(d.data&&d.data[0]){
-        const id=d.data[0].id;
-        document.getElementById("avatarImg").src=`https://www.roblox.com/headshot-thumbnail/image?userId=${id}&width=150&height=150&format=png`;
-      }
     });
+    const data=await res.json();
+    if(data.data&&data.data[0]){
+      const id=data.data[0].id;
+      const avatarUrl=`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=150x150&format=Png&isCircular=false`;
+      const img=document.createElement("img");
+      img.src=avatarUrl;
+      img.onload=()=>{
+        const box=document.getElementById("avatarBox");
+        box.classList.remove("skeleton");
+        box.innerHTML="";
+        box.appendChild(img);
+      };
+    }
+  }catch(e){console.log("avatar error",e)}
+
+  // Step 2: simulate fetching pet
+  setTimeout(()=>{
+    const petBox=document.getElementById("petBox");
+    petBox.innerHTML=`<img src="${pet.src}"><h3>${pet.name}</h3>`;
+    document.getElementById("shareBox").style.display="block";
+    // share link
     const url=`${location.origin}${location.pathname}?user=${encodeURIComponent(username)}&pet=${encodeURIComponent(pet.src)}`;
     const link=document.getElementById("shareLink");
     link.href=url;
     link.textContent=url;
-  }
+  },2200); // delay for effect
 }
 </script>
 </body>
