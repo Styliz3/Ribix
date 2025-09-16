@@ -3,152 +3,85 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PartyLinks — Create & Share</title>
-<meta name="description" content="Create a custom message link that shows a clean showcase page. Links expire after 1 hour.">
-<!-- Static OG preview (used by Discord/X): customize image if you like -->
+<title>PartyLinks</title>
+<meta name="description" content="Create custom message links with animated cards. Links expire after 1 hour.">
+
+<!-- Static OG tags (embed preview is same for all links) -->
 <meta property="og:title" content="🎉 PartyLinks — Custom Message" />
-<meta property="og:description" content="Create a short custom message link — expires after 1 hour." />
+<meta property="og:description" content="Create fun shareable message cards. Links expire after 1 hour." />
 <meta property="og:image" content="https://dummyimage.com/1200x630/00ff90/001100.png&text=PartyLinks" />
 <meta name="twitter:card" content="summary_large_image" />
+
 <style>
-  :root{--bg:#081016;--card:#0f1416;--muted:#9bb0b0;--accent:#00d084}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto;min-height:100vh;background:linear-gradient(180deg,var(--bg),#071018);color:#eaf8f0;display:flex;align-items:center;justify-content:center;padding:20px}
-  .wrap{width:100%;max-width:900px;display:grid;grid-template-columns:1fr 360px;gap:20px}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-  h1{margin:0 0 8px;color:var(--accent)}
-  .input-row{display:flex;gap:10px}
-  input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.02);color:inherit}
-  button{padding:10px 12px;border-radius:10px;border:none;background:var(--accent);color:#002218;font-weight:700;cursor:pointer}
-  .links{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-  .link-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;font-size:14px}
-  .preview{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-  .avatar{width:120px;height:120px;border-radius:12px;overflow:hidden;background:#081014;display:flex;align-items:center;justify-content:center;font-weight:800}
-  .msg{background:#e6fff4;color:#042016;padding:12px;border-radius:10px;font-weight:800;display:inline-block;max-width:100%;word-break:break-word}
-  .small{color:var(--muted);font-size:13px}
-  .badge{padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.3);font-weight:700}
-  @media (max-width:900px){.wrap{grid-template-columns:1fr;}}
+body{margin:0;font-family:Inter,system-ui,Segoe UI;background:#0a0f12;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.card{background:#15181c;padding:30px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.6);max-width:460px;width:100%;text-align:center}
+h1{margin:0 0 15px;color:#00ff90}
+input,button{padding:14px;border-radius:10px;font-size:16px;border:none}
+input{flex:1;background:#1e2227;color:#fff}
+button{background:#00ff90;color:#000;font-weight:bold;cursor:pointer}
+.input-row{display:flex;gap:10px;margin-top:15px}
+.links{margin-top:15px;font-size:14px}
+.avatar{width:120px;height:120px;border-radius:12px;overflow:hidden;margin:0 auto 15px;background:#111;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:32px}
+.msg{background:#e6fff4;color:#042016;padding:12px;border-radius:10px;font-weight:800;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.fade{animation:fadein 1s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- Left: Creator -->
-    <div class="card">
-      <h1>PartyLinks</h1>
-      <div class="small">Create a short custom message and get a shareable showdown page. Links expire after 1 hour.</div>
-      <div style="height:12px"></div>
-      <div class="input-row">
-        <input id="msg" placeholder="Type message (e.g. 'Alex is awesome 🎉')" maxlength="220">
-        <button id="create">Create</button>
-      </div>
-      <div style="height:10px"></div>
-      <div class="small">Your recent links (saved in this browser)</div>
-      <div class="links" id="recentList"><div class="small" id="none">No links yet.</div></div>
-    </div>
-
-    <!-- Right: Preview / Showcase -->
-    <div class="card preview" id="previewCard">
-      <div id="showMode">
-        <div class="avatar" id="avatar"><span id="avatarText">PL</span></div>
-        <div class="small" id="metaText">No active link</div>
-        <div class="msg" id="bigMsg">Create a link to see the showcase here.</div>
-        <div class="small">Views: <span id="views">0</span></div>
-        <div style="height:8px"></div>
-        <div style="display:flex;gap:8px">
-          <button id="openCreate" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--accent)">Create your own</button>
-          <div class="badge" id="statusBadge" style="display:none"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div id="app"></div>
 
 <script>
-/* Minimal client-only PartyLinks:
-   - create encoded link: ?d=BASE64(JSON{id,msg,ts})
-   - store creator's recent links in localStorage
-   - when opening a link, decode, increment viewer-side count (localStorage), show showcase
-   - no webhooks, no server
-*/
-const KEY='pl_links_v2', VIEWP='pl_views_v2_'; const EX=3600;
-const el={msg:qs('#msg'),create:qs('#create'),recent:qs('#recentList'),none:qs('#none'),
-  avatar:qs('#avatar'),avatarText:qs('#avatarText'),meta:qs('#metaText'),bigMsg:qs('#bigMsg'),
-  views:qs('#views'),openCreate:qs('#openCreate'),status:qs('#statusBadge')};
+const app=document.getElementById('app');
+const path=window.location.pathname;
 
-function qs(s){return document.querySelector(s)}
-function uid(n=8){const a='abcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<n;i++)r+=a[Math.floor(Math.random()*a.length)];return r}
-function now(){return Math.floor(Date.now()/1000)}
-function save(a){localStorage.setItem(KEY,JSON.stringify(a))}
-function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
-function b64enc(o){return btoa(encodeURIComponent(JSON.stringify(o)))}
-function b64dec(s){try{return JSON.parse(decodeURIComponent(atob(s)))}catch(e){return null}}
+// --- Showcase page (/@username) ---
+if(path.startsWith('/@') && path.length>2){
+  const user=decodeURIComponent(path.slice(2));
+  const viewsKey='pl_views_'+user;
+  let views=parseInt(localStorage.getItem(viewsKey)||'0',10)+1;
+  localStorage.setItem(viewsKey,views);
 
-function makeURL(obj){return location.origin+location.pathname+'?d='+b64enc(obj)}
-function renderRecent(){
-  const arr=load().slice().reverse(); el.recent.innerHTML=''; if(arr.length===0){el.none.style.display='block'; return;} el.none.style.display='none';
-  for(const it of arr){
-    const row=document.createElement('div'); row.className='link-item';
-    const left=document.createElement('div'); left.innerHTML=`<div style="font-weight:700">${escapeHtml(it.msg)}</div><div class="small">${formatAge(it.ts)}</div>`;
-    const right=document.createElement('div');
-    const cp=document.createElement('button'); cp.textContent='Copy'; cp.onclick=()=>{navigator.clipboard?.writeText(makeURL(it)); cp.textContent='Copied'; setTimeout(()=>cp.textContent='Copy',900)}
-    const del=document.createElement('button'); del.textContent='Remove'; del.onclick=()=>{ const a=load().filter(x=>x.id!==it.id); save(a); renderRecent(); }
-    right.appendChild(cp); right.appendChild(del);
-    row.appendChild(left); row.appendChild(right); el.recent.appendChild(row);
-  }
+  app.innerHTML=`
+    <div class="card fade">
+      <div class="avatar">${user.slice(1,3).toUpperCase()}</div>
+      <h2>@${user}</h2>
+      <div class="msg">@${user} is here 🎉</div>
+      <p>Views: ${views}</p>
+      <div style="margin-top:12px">
+        <a href="/" style="color:#00ff90;text-decoration:none;font-weight:700">➕ Create your own</a>
+      </div>
+    </div>`;
 }
-
-function formatAge(ts){const age=now()-ts; if(age>EX) return `Expired ${Math.floor(age/60)}m ago`; const rem=EX-age; return `Expires in ${Math.floor(rem/60)}m ${rem%60}s`}
-
-function escapeHtml(s){return s.replace(/[&<>"']/g,ch=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[ch])}
-
-el.create.addEventListener('click', ()=>{
-  const txt=(el.msg.value||'').trim(); if(!txt) return alert('Type a message');
-  const obj={id:uid(9),msg:txt,ts:now()};
-  const arr=load(); arr.push(obj); save(arr); renderRecent();
-  // show preview + copy url
-  showFor(obj); navigator.clipboard?.writeText(makeURL(obj)).catch(()=>{});
-  el.msg.value=''; el.create.textContent='Created'; setTimeout(()=>el.create.textContent='Create',800);
-});
-
-el.openCreate.addEventListener('click', ()=>{ history.replaceState({},'',location.pathname); initHome() })
-
-// when opening a link ?d=...
-function handleIncoming(){
-  const p=new URLSearchParams(location.search);
-  if(!p.has('d')) return initHome();
-  const obj=b64dec(p.get('d')); if(!obj){ initHome(); return }
-  // increment viewer-side views
-  const vkey=VIEWP+obj.id; const prev=parseInt(localStorage.getItem(vkey)||'0',10); localStorage.setItem(vkey,String(prev+1));
-  // show showcase
-  showFor(obj);
+// --- Homepage (/): generator ---
+else{
+  app.innerHTML=`
+    <div class="card fade">
+      <h1>PartyLinks</h1>
+      <p>Create a fun shareable link like <b>/@YourName</b></p>
+      <div class="input-row">
+        <input id="username" placeholder="Enter a name or tag" />
+        <button id="makeBtn">Create</button>
+      </div>
+      <div class="links" id="links"></div>
+    </div>`;
+  const btn=document.getElementById('makeBtn');
+  const input=document.getElementById('username');
+  const list=document.getElementById('links');
+  const storageKey='pl_recent';
+  const render=()=>{
+    const arr=JSON.parse(localStorage.getItem(storageKey)||'[]');
+    list.innerHTML=arr.map(u=>`<div><a href="/@${encodeURIComponent(u)}">/@${u}</a></div>`).join('')||'<i>No links yet</i>';
+  };
+  render();
+  btn.onclick=()=>{
+    const val=input.value.trim();
+    if(!val)return alert('Enter a name');
+    const arr=JSON.parse(localStorage.getItem(storageKey)||'[]');
+    arr.push(val); localStorage.setItem(storageKey,JSON.stringify(arr));
+    window.location.href='/@'+encodeURIComponent(val);
+  };
 }
-
-function showFor(obj){
-  // update preview UI
-  const age=now()-obj.ts;
-  el.bigMsg.textContent=obj.msg;
-  el.meta.textContent = (age>EX) ? `Created ${Math.floor(age/60)}m ago — expired` : `Created just now • expires in ${Math.floor((EX-age)/60)}m`;
-  el.views.textContent = localStorage.getItem(VIEWP+obj.id)||'0';
-  el.avatarText.textContent = initialsFrom(obj.msg);
-  el.avatar.style.background = '#'+colorFrom(obj.id);
-  el.status.style.display='inline-block';
-  el.status.textContent = (age>EX)?'Expired':'Active';
-  // ensure preview is visible (it is), remove query if user clicks create
-}
-
-function initialsFrom(msg){
-  const t=msg.trim();
-  if(t.startsWith('@')){ const u=t.slice(1).split(/\s+/)[0]; return u.slice(0,2).toUpperCase(); }
-  const letters = t.replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase(); return letters||'PL';
-}
-function colorFrom(s){
-  let h=0; for(let i=0;i<s.length;i++) h=(h<<5)-h+s.charCodeAt(i); h=Math.abs(h);
-  const r=(h>>16)&255, g=(h>>8)&255, b=h&255; return [r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
-}
-
-function initHome(){ renderRecent(); el.bigMsg.textContent='Create a link to see the showcase here.'; el.meta.textContent='No active link'; el.views.textContent='0'; el.avatarText.textContent='PL'; el.avatar.style.background='#081014'; el.status.style.display='none' }
-
-// bootstrap
-renderRecent(); handleIncoming();
 </script>
 </body>
 </html>
