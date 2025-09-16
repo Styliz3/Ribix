@@ -6,7 +6,7 @@
 <title>EmeraldPet — Roblox Pet Generator</title>
 <meta name="description" content="Generate your exclusive Roblox pet instantly with EmeraldPet. Looks official, totally free!">
 
-<!-- OG/Twitter preview (static default) -->
+<!-- Open Graph (Discord Embed preview) -->
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="EmeraldPet"/>
 <meta property="og:title" content="EmeraldPet — Free Roblox Pet Generator"/>
@@ -17,31 +17,79 @@
 
 <style>
 body {
-  margin:0;font-family:"Segoe UI",sans-serif;background:#0d0f11;color:#fff;
-  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;
+  margin:0;
+  font-family:"Segoe UI",sans-serif;
+  background:linear-gradient(135deg,#0a0d11,#12161d);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:20px;
 }
 .card {
-  background:#15181c;border-radius:12px;padding:30px;
-  max-width:440px;width:100%;text-align:center;
-  box-shadow:0 8px 24px rgba(0,0,0,0.6);
+  background:#15181c;
+  border-radius:16px;
+  padding:40px 30px;
+  width:100%;
+  max-width:460px;
+  text-align:center;
+  box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  transition:all .3s ease;
 }
-h1 {margin:0 0 15px;color:#00ff90;font-size:22px;}
-input,button {
-  width:100%;padding:12px;border-radius:8px;font-size:16px;margin-bottom:12px;border:none;
+h1 {
+  margin:0 0 20px;
+  font-size:24px;
+  color:#00ff90;
 }
-input{background:#1e2227;color:#fff;}
-button{background:#00ff90;color:#000;font-weight:bold;cursor:pointer;}
-.avatar{margin:20px auto;width:120px;height:120px;border-radius:12px;overflow:hidden;background:#111;position:relative;}
-.avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-.pet{margin-top:20px;min-height:200px;position:relative;}
-.pet img{width:200px;border-radius:12px;animation:pop .4s ease;}
-@keyframes pop {0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.input-box {
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+input {
+  flex:1;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #222;
+  background:#1c2026;
+  color:#fff;
+  font-size:16px;
+  outline:none;
+  transition:all .2s;
+}
+input:focus {
+  border-color:#00ff90;
+  box-shadow:0 0 6px rgba(0,255,144,0.4);
+}
+button {
+  padding:14px 18px;
+  border:none;
+  border-radius:10px;
+  background:#00ff90;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer;
+  transition:all .2s;
+}
+button:hover {
+  background:#00cc70;
+}
+.avatar {
+  margin:20px auto;
+  width:120px;height:120px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#111;
+}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.pet{margin-top:20px;min-height:220px;}
+.pet img{width:220px;border-radius:12px;animation:pop .4s ease;}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
 .share{margin-top:20px;font-size:14px;background:#222;padding:10px;border-radius:8px;word-break:break-all;}
 
-/* Skeleton loading effect */
-.skeleton{background:linear-gradient(90deg,#222 25%,#333 37%,#222 63%);background-size:400% 100%;animation:skeleton 1.4s ease infinite;}
-@keyframes skeleton{0%{background-position:100% 50%}100%{background-position:0 50%}}
-.loading-bar{height:10px;border-radius:6px;overflow:hidden;margin-top:15px;}
+/* Progress loading bar */
+.loading-bar{height:10px;border-radius:6px;overflow:hidden;margin:20px auto;width:80%;background:#222;}
 .loading-fill{width:0%;height:100%;background:#00ff90;animation:fill 2s linear forwards;}
 @keyframes fill{from{width:0%}to{width:100%}}
 </style>
@@ -50,11 +98,14 @@ button{background:#00ff90;color:#000;font-weight:bold;cursor:pointer;}
 <div class="card" id="generator">
   <h1>EmeraldPet Generator</h1>
   <div id="formArea">
-    <input id="username" placeholder="Enter Roblox username">
-    <button onclick="generate()">Generate Pet</button>
+    <div class="input-box">
+      <input id="username" placeholder="Enter Roblox username">
+      <button onclick="generate()">Go</button>
+    </div>
   </div>
+
   <div id="resultArea" style="display:none;">
-    <div class="avatar skeleton" id="avatarBox"></div>
+    <div class="avatar" id="avatarBox"><img id="avatarImg" src=""></div>
     <h2 id="displayName"></h2>
     <div class="pet" id="petBox">
       <div class="loading-bar"><div class="loading-fill"></div></div>
@@ -76,15 +127,16 @@ const PETS=[
 
 async function generate(){
   const username=document.getElementById("username").value.trim();
-  if(!username)return alert("Enter username");
+  if(!username)return alert("Enter a username!");
   document.getElementById("formArea").style.display="none";
   document.getElementById("resultArea").style.display="block";
   document.getElementById("displayName").textContent=username;
-  // random pet
+
+  // Pick random pet
   const pet=PETS[Math.floor(Math.random()*PETS.length)];
 
-  // Step 1: load avatar reliably
-  try{
+  // Get userId first
+  try {
     const res=await fetch("https://users.roblox.com/v1/usernames/users",{
       method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({usernames:[username]})
@@ -92,29 +144,27 @@ async function generate(){
     const data=await res.json();
     if(data.data&&data.data[0]){
       const id=data.data[0].id;
-      const avatarUrl=`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=150x150&format=Png&isCircular=false`;
-      const img=document.createElement("img");
-      img.src=avatarUrl;
-      img.onload=()=>{
-        const box=document.getElementById("avatarBox");
-        box.classList.remove("skeleton");
-        box.innerHTML="";
-        box.appendChild(img);
-      };
+      // Use thumbnails API for avatar
+      const avatarUrl=`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=150x150&format=Png`;
+      fetch(avatarUrl).then(r=>r.json()).then(av=>{
+        if(av.data&&av.data[0]){
+          document.getElementById("avatarImg").src=av.data[0].imageUrl;
+        }
+      });
     }
-  }catch(e){console.log("avatar error",e)}
+  } catch(e){console.log("avatar error",e)}
 
-  // Step 2: simulate fetching pet
+  // Fake pet fetching delay
   setTimeout(()=>{
     const petBox=document.getElementById("petBox");
     petBox.innerHTML=`<img src="${pet.src}"><h3>${pet.name}</h3>`;
     document.getElementById("shareBox").style.display="block";
-    // share link
+    // Generate share link
     const url=`${location.origin}${location.pathname}?user=${encodeURIComponent(username)}&pet=${encodeURIComponent(pet.src)}`;
     const link=document.getElementById("shareLink");
     link.href=url;
     link.textContent=url;
-  },2200); // delay for effect
+  },2200);
 }
 </script>
 </body>
