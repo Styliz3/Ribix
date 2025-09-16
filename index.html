@@ -1,104 +1,450 @@
 <!doctype html>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>EmeraldPet — Free Roblox Pet Generator</title>
+<link rel="icon" href="data:," />
 <style>
-:root{ --bg:#0b0c0f; --panel:#111319; --muted:#8b93a6; --ink:#e6e8ef; --accent:#7c9dff; --accent-2:#5be3b4; --border:#1b1f2a; }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto}
-.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-bottom:1px solid var(--border);backdrop-filter:saturate(150%) blur(10px);background:rgba(12,14,17,.7)}
-.logo{display:flex;align-items:center;gap:.5rem;font-weight:700}
-.logo-mark{width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 0 2px rgba(124,157,255,.35) inset}
-.doc-title{border:0;background:transparent;color:var(--ink);font-weight:600;padding:.25rem .5rem;border-radius:.5rem}
-.doc-title:focus{outline:2px solid var(--accent);}
-.spacer{flex:1}
-.btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--border);background:linear-gradient(180deg,#151826,#0f111a);padding:.45rem .7rem;border-radius:.6rem;color:var(--ink);cursor:pointer}
-.btn:hover{border-color:#2a3142}
-.toolbar{position:sticky;top:44px;z-index:20;display:flex;flex-wrap:wrap;gap:.4rem;padding:.5rem;border-bottom:1px solid var(--border);background:#0e1016}
-.group{display:flex;gap:.25rem;padding:.25rem;border:1px solid var(--border);border-radius:.6rem;background:linear-gradient(180deg,#10131d,#0e1118)}
-.tool{padding:.4rem .55rem;border-radius:.45rem;border:1px solid transparent;cursor:pointer;color:var(--muted)}
-.tool:hover{border-color:#2c3343;color:var(--ink)}
-.page-wrap{display:flex;justify-content:center;padding:2rem}
-.page{width:840px;min-height:1200px;background:#0f1117;border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 45px rgba(0,0,0,.35);padding:3rem;}
-.editor{min-height:1000px;outline:none}
-.editor:empty:before{content:attr(data-placeholder);color:#687089}
-.hr{height:1px;background:var(--border);margin:.75rem -.5rem}
-.status{font-size:12px;color:var(--muted)}
-.ctx{position:absolute;z-index:40;display:none;min-width:220px;background:#0f1117;border:1px solid var(--border);border-radius:.6rem;box-shadow:0 14px 40px rgba(0,0,0,.38)}
-.ctx .item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;color:#c6cbe0;cursor:pointer}
-.ctx .item:hover{background:#141a27}
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(5,7,10,.6);backdrop-filter:blur(8px);z-index:50}
-.sheet{width:min(680px,92vw);background:#0f1118;border:1px solid var(--border);border-radius:16px;box-shadow:0 18px 70px rgba(0,0,0,.55);padding:1rem}
-.sheet h3{margin:.25rem 0 0;font-weight:700}
-.sheet p{margin:.25rem 0;color:var(--muted)}
-.row{display:flex;gap:.6rem;margin-top:.8rem}
-.inp, textarea.inp{flex:1;border:1px solid var(--border);background:#0b0d13;color:var(--ink);border-radius:.6rem;padding:.7rem}
-.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem}
-.chip{border:1px solid var(--border);padding:.35rem .6rem;border-radius:999px;color:#cbd1e8;cursor:pointer}
-.chip:hover{border-color:#2e3750}
-.sheet .actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.8rem}
-.welcome{display:none;gap:.6rem;align-items:center;background:linear-gradient(90deg,rgba(124,157,255,.15),transparent);border:1px dashed #2b3350;border-radius:.6rem;padding:.6rem .8rem;margin-left:.5rem}
+  :root{
+    --bg:#0b0d10; --card:#0f1114; --accent:#00d084; --muted:#8b95a1;
+    --glass: rgba(255,255,255,0.03);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,#071017 0%, #0e1114 60%);
+    color:#e6eef6;
+    -webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;padding:32px;
+  }
+
+  /* Container */
+  .wrap{
+    width:100%; max-width:980px; display:grid; grid-template-columns: 1fr 420px; gap:28px;
+    align-items:start;
+  }
+
+  /* Left: main generator card */
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-radius:var(--radius);
+    padding:28px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+  header.brand{
+    display:flex;align-items:center;gap:14px;margin-bottom:8px;
+  }
+  .logo {
+    width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#002b1a,#003f22);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);font-size:20px;box-shadow:0 6px 18px rgba(0,0,0,0.6)
+  }
+  h1{margin:0;font-size:20px;letter-spacing:-0.2px}
+  p.lead{margin:6px 0 18px;color:var(--muted);font-size:13px}
+
+  /* form */
+  .form-row{display:flex;gap:12px;align-items:center}
+  .input{
+    background:var(--glass); border-radius:10px; border:1px solid rgba(255,255,255,0.04); padding:12px 14px; font-size:15px; color: #eaf6ef; flex:1;
+  }
+  .btn{
+    background: linear-gradient(180deg,var(--accent),#00b26a); border:none;padding:12px 16px;border-radius:10px;color:#02110a;font-weight:700;cursor:pointer;box-shadow: 0 8px 18px rgba(0,208,132,0.16);
+  }
+  .btn:active{transform:translateY(1px)}
+
+  /* scan area */
+  .scan {
+    margin-top:18px;padding:16px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    border:1px dashed rgba(255,255,255,0.03);
+  }
+  .scan-line{
+    height:8px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.06));
+    border-radius:6px; overflow:hidden; position:relative;
+  }
+  .progress-bar{height:8px;border-radius:6px; width:0%; background: linear-gradient(90deg, #00ff9f, #00b26a); box-shadow: 0 6px 18px rgba(0,178,106,0.12); transition:width 350ms linear;}
+  .scan-steps{display:flex;gap:10px;margin-top:12px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+  .step {padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.02)}
+
+  /* right column: profile + result */
+  .side-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    border-radius:var(--radius); padding:20px; border:1px solid rgba(255,255,255,0.03);
+  }
+  .profile{
+    display:flex;gap:12px;align-items:center;
+  }
+  .avatar{
+    width:96px;height:96px;border-radius:12px;overflow:hidden;background:#111;border:1px solid rgba(255,255,255,0.03);
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  .profile .meta{flex:1}
+  .username{font-weight:700;font-size:16px}
+  .userid{color:var(--muted);font-size:13px;margin-top:4px}
+
+  .generated{
+    margin-top:18px;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(255,255,255,0.01)); text-align:center;
+  }
+  .big-pet{width:220px;height:220px;margin:6px auto;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+  .big-pet img{max-width:100%;max-height:100%}
+
+  .pet-grid{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .pet-grid img{width:86px;height:86px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);object-fit:cover;cursor:pointer;transition:transform .18s ease}
+  .pet-grid img:hover{transform:translateY(-6px)}
+
+  .badge-live{
+    display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:999px;background:rgba(0,0,0,0.35);border:1px solid rgba(0,0,0,0.2);font-weight:700;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;background:#ff3b30;box-shadow:0 6px 18px rgba(255,59,48,0.14);animation: pulse 1.4s infinite}
+  @keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.82)}100%{opacity:1;transform:scale(1)}}
+
+  .counts{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .total{
+    font-size:18px;font-weight:800;color:var(--accent)
+  }
+  .recent{
+    background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:10px;font-size:13px;color:var(--muted)
+  }
+
+  /* small animations */
+  .pop {
+    position:relative;
+    display:inline-block;
+    transform-origin:center;
+    animation: popin .42s ease;
+  }
+  @keyframes popin {0%{opacity:0;transform:translateY(6px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
+
+  /* footer */
+  .foot{
+    margin-top:18px;color:var(--muted);font-size:13px;text-align:center;grid-column: 1 / -1;
+  }
+
+  /* responsive */
+  @media (max-width:900px){
+    .wrap{grid-template-columns:1fr; padding:0 6px}
+    .side-card{order:-1}
+  }
 </style>
 </head>
 <body>
-<div class="topbar">
-<div class="logo"><div class="logo-mark"></div><span>DoAI</span></div>
-<input id="docTitle" class="doc-title" value="Untitled" />
-<div class="welcome" id="welcomeStrip"></div>
-<div class="spacer"></div>
-<button class="btn" id="aiPanelBtn">⚡ AI Tools</button>
-<button class="btn" id="exportBtn">⬇️ Export</button>
-<span class="status" id="saveStatus">Saved</span>
-</div>
-<div class="toolbar" id="toolbar">
-<div class="group">
-<button class="tool" data-cmd="bold"><b>B</b></button>
-<button class="tool" data-cmd="italic"><i>I</i></button>
-<button class="tool" data-cmd="underline"><u>U</u></button>
-<button class="tool" data-cmd="insertUnorderedList">• List</button>
-<button class="tool" data-cmd="insertOrderedList">1. List</button>
-<button class="tool" id="h1Btn">H1</button>
-<button class="tool" id="h2Btn">H2</button>
-<button class="tool" id="clearFmt">🧽</button>
-</div>
-<div class="group">
-<button class="tool" id="aiRewrite">Rewrite</button>
-<button class="tool" id="aiShorten">Shorten</button>
-<button class="tool" id="aiExtend">Extend</button>
-<button class="tool" id="aiFix">Fix grammar</button>
-<button class="tool" id="aiTone">Tone</button>
-<button class="tool" id="aiBullets">Bullets</button>
-<button class="tool" id="aiSummarize">Summarize</button>
-</div>
-</div>
-<div class="page-wrap">
-<div class="page">
-<div id="editor" class="editor" contenteditable="true" data-placeholder="Start typing…"></div>
-</div>
-</div>
-<div class="ctx" id="contextMenu">
-<div class="item" data-action="ai">⚡ Ask DoAI…</div>
-<div class="item" data-action="copy">📋 Copy</div>
-<div class="item" data-action="cut">✂️ Cut</div>
-<div class="item" data-action="paste">📥 Paste</div>
-</div>
-<div class="modal" id="aiModal">
-<div class="sheet">
-<h3>Ask DoAI</h3>
-<p id="aiLead">Okay, what should I do?</p>
-<div class="chips" id="quickChips">
-<div class="chip" data-template="Rewrite the selection more professionally.">Professional</div>
-<div class="chip" data-template="Summarize in 3 bullets.">Summary</div>
-<div class="chip" data-template="Translate to {lang}.">Translate</div>
-</div>
-<div class="row"><textarea id="aiPrompt" rows="4" class="inp"></textarea></div>
-<div class="actions">
-<button class="btn" id="aiCancel">Cancel</button>
-<button class="btn" id="aiRun">Run</button>
-</div>
-<p class="status" id="aiStatus"></p>
-</div>
-</div>
-<script src="./app.js"></script>
+  <div class="wrap">
+    <!-- LEFT: Generator -->
+    <div class="card">
+      <div class="brand header">
+        <div class="logo">EP</div>
+        <div>
+          <h1>EmeraldPet — Free Pet Generator</h1>
+          <p class="lead">Enter a Roblox username, scan the profile, and get a rare pet — totally free. (Prank site)</p>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:6px">
+        <input id="username" class="input" placeholder="Roblox username (e.g. Builderman)" />
+        <button id="goBtn" class="btn">Scan & Generate</button>
+      </div>
+
+      <div class="scan" aria-hidden="false" id="scanArea" style="margin-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="badge-live"><span class="dot"></span> LIVE</div>
+            <div style="font-weight:700">Real-time generation</div>
+          </div>
+          <div style="font-size:13px;color:var(--muted)">EmeraldPet v1.2</div>
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="scan-line"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="scan-steps" id="scanSteps">
+            <div class="step" id="step1">Queued</div>
+            <div class="step" id="step2">Looking up profile</div>
+            <div class="step" id="step3">Analyzing inventory</div>
+            <div class="step" id="step4">Generating pet</div>
+            <div class="step" id="step5">Finalizing</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:13px;color:var(--muted)"><em id="scanStatus">Awaiting input...</em></div>
+      </div>
+
+      <div style="margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--muted)">People helped</div>
+          <div id="totalCounter" class="total">—</div>
+        </div>
+        <div style="min-width:160px">
+          <div style="font-size:13px;color:var(--muted)">Recent</div>
+          <div id="recentLive" class="recent">1 person just generated</div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;color:var(--muted);font-size:13px">
+        Note: This is a prank/novelty generator for entertainment — not affiliated with Roblox.
+      </div>
+    </div>
+
+    <!-- RIGHT: Profile & Generated Pet -->
+    <div class="side-card">
+      <div class="profile">
+        <div class="avatar" id="avatarWrap">
+          <!-- avatar img inserted here -->
+          <img id="avatarImg" src="https://www.roblox.com/headshot-thumbnail/image?username=Roblox&width=150&height=150&format=png" alt="avatar" />
+        </div>
+        <div class="meta">
+          <div class="username" id="displayName">Guest</div>
+          <div class="userid" id="displayId">Enter a username to scan</div>
+        </div>
+      </div>
+
+      <div class="generated" id="generated" style="margin-top:14px;opacity:0.98">
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+          <div style="text-align:left">
+            <div style="font-size:13px;color:var(--muted)">We generated you this</div>
+            <div style="font-weight:800;font-size:18px;margin-top:6px" id="petName">—</div>
+          </div>
+          <div style="width:10px"></div>
+        </div>
+
+        <div class="big-pet" id="bigPet">
+          <img src="https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png" alt="pet" id="bigPetImg" />
+        </div>
+
+        <div class="pet-grid" id="petGrid">
+          <!-- thumbnails -->
+          <img src="https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png" data-name="Diamond Phantom Overseer" />
+          <img src="https://etu-values.vercel.app/assets/pets/shiny-phantom-overseer.png" data-name="Shiny Phantom Overseer" />
+          <img src="https://etu-values.vercel.app/assets/pets/shiny-sakura-tarragon.png" data-name="Shiny Sakura Tarragon" />
+        </div>
+
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:12px">
+          <button id="claimBtn" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent)">Add to Inventory</button>
+          <button id="shareBtn" class="btn" style="background:linear-gradient(180deg,#00c97f,#00a45f);">Share</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">© 2025 EmeraldPet • Not affiliated with or endorsed by Roblox Corporation</div>
+  </div>
+
+<script>
+  // configuration
+  const PETS = [
+    { src: 'https://etu-values.vercel.app/assets/pets/diamond-phantom-overseer.png', name: 'Diamond Phantom Overseer' },
+    { src: 'https://etu-values.vercel.app/assets/pets/shiny-phantom-overseer.png', name: 'Shiny Phantom Overseer' },
+    { src: 'https://etu-values.vercel.app/assets/pets/shiny-sakura-tarragon.png', name: 'Shiny Sakura Tarragon' },
+  ];
+
+  // friendly base starting count
+  let baseTotal = Math.floor(Math.random() * 6000) + 2000;
+  let total = baseTotal;
+
+  // UI refs
+  const usernameInput = document.getElementById('username');
+  const goBtn = document.getElementById('goBtn');
+  const progressBar = document.getElementById('progressBar');
+  const scanStatus = document.getElementById('scanStatus');
+  const stepEls = [ 'step1','step2','step3','step4','step5' ].map(id => document.getElementById(id));
+  const avatarImg = document.getElementById('avatarImg');
+  const displayName = document.getElementById('displayName');
+  const displayId = document.getElementById('displayId');
+  const bigPetImg = document.getElementById('bigPetImg');
+  const petNameEl = document.getElementById('petName');
+  const petGrid = document.getElementById('petGrid');
+  const totalCounter = document.getElementById('totalCounter');
+  const recentLive = document.getElementById('recentLive');
+  const progressSteps = [
+    { text: 'Queued', pct: 6 },
+    { text: 'Looking up profile', pct: 28 },
+    { text: 'Analyzing inventory', pct: 56 },
+    { text: 'Generating pet', pct: 84 },
+    { text: 'Finalizing', pct: 100 }
+  ];
+
+  // initial UI
+  totalCounter.textContent = numberWithCommas(total) + ' Has already generated a Pet!';
+  petNameEl.textContent = PETS[0].name;
+  recentLive.textContent = '1 person just generated';
+
+  // make thumbnails clickable
+  Array.from(petGrid.querySelectorAll('img')).forEach(img => {
+    img.addEventListener('click', () => {
+      document.querySelectorAll('#petGrid img').forEach(i => i.style.outline = 'none');
+      img.style.outline = '3px solid rgba(0,208,132,0.14)';
+      bigPetImg.src = img.src;
+      petNameEl.textContent = img.dataset.name || 'Emerald Pet';
+    });
+  });
+
+  // pick one initially
+  (function pickInitial(){
+    const choice = PETS[Math.floor(Math.random()*PETS.length)];
+    bigPetImg.src = choice.src;
+    petNameEl.textContent = choice.name;
+  })();
+
+  // helper
+  function numberWithCommas(x){ return x.toLocaleString(); }
+
+  // animate progress bar step-by-step for "real scan"
+  async function runScanSequence(username){
+    // reset UI
+    progressBar.style.width = '2%';
+    scanStatus.textContent = 'Starting scan...';
+    stepEls.forEach(el => el.style.background = 'transparent');
+    for (let i=0;i<progressSteps.length;i++){
+      const step = progressSteps[i];
+      // mark step active
+      stepEls[i].style.background = 'linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00))';
+      stepEls[i].style.border = '1px solid rgba(255,255,255,0.035)';
+      scanStatus.textContent = step.text + '...';
+      // animate progress to step.pct with small randomized easing
+      await animateProgressTo(step.pct);
+      // short pause to feel realistic, but vary timing slightly
+      await wait(120 + Math.random()*420);
+    }
+    scanStatus.textContent = 'Completed ✓';
+    await wait(220);
+  }
+
+  function animateProgressTo(targetPct){
+    return new Promise(resolve => {
+      const start = parseFloat(progressBar.style.width) || 0;
+      const duration = 300 + Math.floor(Math.random()*700); // variable speed
+      const startTime = performance.now();
+      function tick(now){
+        const t = Math.min(1, (now-startTime)/duration);
+        const eased = t<0.5 ? 2*t*t : -1 + (4-2*t)*t; // ease
+        const cur = start + (targetPct - start) * eased;
+        progressBar.style.width = cur.toFixed(2) + '%';
+        if (t < 1) requestAnimationFrame(tick);
+        else resolve();
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  // simulate "live" small counter that increments 1 by 1 at gentle random pace
+  // This will keep running in background after first generate.
+  let liveRunning = false;
+  function startLiveTicker(){
+    if (liveRunning) return;
+    liveRunning = true;
+    (function tick(){
+      const min = 420, max = 1400; // milliseconds between increments
+      const delay = Math.floor(Math.random()*(max-min))+min;
+      setTimeout(() => {
+        total += 1;
+        // update small "recent" text alternating phrasing
+        const names = ['players', 'people', 'users', 'friends'];
+        const r = Math.random();
+        const phrase = r < 0.4 ? `${Math.floor(Math.random()*5)+1} people just generated` : `${Math.floor(Math.random()*3)+1} players just generated`;
+        recentLive.textContent = phrase;
+        // animate number change with pop
+        totalCounter.innerHTML = `<span class="pop">${numberWithCommas(total)} Has already generated a Pet!</span>`;
+        // occasionally flash the 'recent' with small pop
+        if (Math.random() < 0.15) {
+          recentLive.classList.add('pop');
+          setTimeout(()=> recentLive.classList.remove('pop'), 600);
+        }
+        // continue forever (gentle)
+        if (liveRunning) tick();
+      }, delay);
+    })();
+  }
+
+  // main generate handler
+  goBtn.addEventListener('click', async () => {
+    const username = usernameInput.value.trim();
+    if (!username){
+      usernameInput.focus();
+      usernameInput.style.outline = '2px solid rgba(0,208,132,0.12)';
+      setTimeout(()=> usernameInput.style.outline = 'none',600);
+      return;
+    }
+    // disable inputs while scanning
+    goBtn.disabled = true; goBtn.textContent = 'Scanning…';
+    usernameInput.disabled = true;
+    displayName.textContent = username;
+    displayId.textContent = 'Fetching avatar...';
+    avatarImg.src = `https://www.roblox.com/headshot-thumbnail/image?username=${encodeURIComponent(username)}&width=150&height=150&format=png`;
+
+    // run the multi-step scan
+    try {
+      await runScanSequence(username);
+      // after scan, pick a pet (biased to rare diamond sometimes)
+      let choice;
+      const roll = Math.random();
+      if (roll > 0.94) choice = PETS[1]; // tiny chance for shiny variant
+      else if (roll > 0.75) choice = PETS[2];
+      else choice = PETS[0];
+      bigPetImg.src = choice.src;
+      petNameEl.textContent = choice.name;
+
+      // small celebratory UI
+      progressBar.style.width = '100%';
+      scanStatus.textContent = 'Pet ready!';
+
+      // add small temporary "spark" animation on big image
+      bigPetImg.style.transform = 'scale(0.98)';
+      setTimeout(()=> bigPetImg.style.transform = 'scale(1.02)', 60);
+      setTimeout(()=> bigPetImg.style.transform = '', 420);
+
+      // increment total by a few to look lively when user creates:
+      const increments = 1 + Math.floor(Math.random()*3);
+      for (let i=0;i<increments;i++){
+        await wait(120 + Math.random()*240);
+        total += 1;
+        totalCounter.innerHTML = `<span class="pop">${numberWithCommas(total)} Has already generated a Pet!</span>`;
+      }
+
+      // set profile text - assume success
+      displayId.textContent = 'Profile scanned successfully';
+      scanStatus.textContent = `Generated: ${choice.name}`;
+      // start live ticker if not already
+      startLiveTicker();
+
+    } catch (err){
+      console.error(err);
+      scanStatus.textContent = 'Scan failed. Try again.';
+    } finally {
+      goBtn.disabled = false;
+      goBtn.textContent = 'Scan & Generate';
+      usernameInput.disabled = false;
+    }
+  });
+
+  // small UX: allow Enter to submit
+  usernameInput.addEventListener('keydown', e=>{
+    if (e.key === 'Enter') goBtn.click();
+  });
+
+  // populate initial total counter nicely on load
+  window.addEventListener('load', () => {
+    totalCounter.innerHTML = `${numberWithCommas(total)} Has already generated a Pet!`;
+    // subtle live starter after page load with small bump
+    setTimeout(()=> {
+      total += Math.floor(Math.random()*3)+1;
+      totalCounter.innerHTML = `<span class="pop">${numberWithCommas(total)} Has already generated a Pet!</span>`;
+    }, 700 + Math.random()*900);
+  });
+
+  // CLAIM and SHARE buttons behaviour (funny prank responses)
+  document.getElementById('claimBtn').addEventListener('click', ()=>{
+    // small fake animation
+    const old = petNameEl.textContent;
+    petNameEl.textContent = 'Adding to inventory…';
+    setTimeout(()=> {
+      petNameEl.textContent = old;
+      alert('Added to inventory (prank). This page is for entertainment only.');
+    }, 900);
+  });
+  document.getElementById('shareBtn').addEventListener('click', ()=>{
+    alert('Share this prank with a friend! Copy the URL and send it to someone you trust 😄');
+  });
+
+</script>
 </body>
 </html>
