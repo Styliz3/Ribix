@@ -1,87 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PartyLinks</title>
-<meta name="description" content="Create custom message links with animated cards. Links expire after 1 hour.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styliz3 | Roblox UI Designer</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 3em;
+      text-transform: uppercase;
+      -webkit-text-stroke: 1px white;
+      color: black;
+      margin-bottom: 10px;
+    }
+    h2, h3 {
+      margin: 20px 0;
+    }
+    img {
+      max-width: 90%;
+      border: 2px solid white;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    a {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid white;
+    }
 
-<!-- Static OG tags (embed preview is same for all links) -->
-<meta property="og:title" content="🎉 PartyLinks — Custom Message" />
-<meta property="og:description" content="Create fun shareable message cards. Links expire after 1 hour." />
-<meta property="og:image" content="https://dummyimage.com/1200x630/00ff90/001100.png&text=PartyLinks" />
-<meta name="twitter:card" content="summary_large_image" />
-
-<style>
-body{margin:0;font-family:Inter,system-ui,Segoe UI;background:#0a0f12;color:#fff;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.card{background:#15181c;padding:30px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.6);max-width:460px;width:100%;text-align:center}
-h1{margin:0 0 15px;color:#00ff90}
-input,button{padding:14px;border-radius:10px;font-size:16px;border:none}
-input{flex:1;background:#1e2227;color:#fff}
-button{background:#00ff90;color:#000;font-weight:bold;cursor:pointer}
-.input-row{display:flex;gap:10px;margin-top:15px}
-.links{margin-top:15px;font-size:14px}
-.avatar{width:120px;height:120px;border-radius:12px;overflow:hidden;margin:0 auto 15px;background:#111;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:32px}
-.msg{background:#e6fff4;color:#042016;padding:12px;border-radius:10px;font-weight:800;animation:pop .4s ease}
-@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
-.fade{animation:fadein 1s ease}
-@keyframes fadein{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-</style>
+    /* Accordion Q&A */
+    .faq {
+      max-width: 800px;
+      margin: 40px auto;
+      text-align: left;
+    }
+    .faq-item {
+      border: 1px solid white;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .faq-question {
+      background: #111;
+      padding: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      position: relative;
+    }
+    .faq-question::after {
+      content: "+";
+      position: absolute;
+      right: 15px;
+    }
+    .faq-question.active::after {
+      content: "-";
+    }
+    .faq-answer {
+      display: none;
+      padding: 15px;
+      background: #000;
+      border-top: 1px solid white;
+    }
+  </style>
 </head>
 <body>
-<div id="app"></div>
 
-<script>
-const app=document.getElementById('app');
-const path=window.location.pathname;
+  <!-- Top Info -->
+  <h1>Styliz3</h1>
+  <h2>Roblox UI Designer</h2>
+  <p style="max-width:700px; margin:20px auto; font-size:1.1em; line-height:1.5;">
+    I design <b>simulator-style UIs</b> that are bold, clean, and engaging.  
+    My work fits <b>any type of game</b>, not just simulators.  
+    With <b>3 months of experience</b>, I focus on making UIs that players enjoy and developers can rely on.  
+  </p>
 
-// --- Showcase page (/@username) ---
-if(path.startsWith('/@') && path.length>2){
-  const user=decodeURIComponent(path.slice(2));
-  const viewsKey='pl_views_'+user;
-  let views=parseInt(localStorage.getItem(viewsKey)||'0',10)+1;
-  localStorage.setItem(viewsKey,views);
+  <!-- Work Showcase -->
+  <h3>My Work</h3>
+  <img src="https://cdn.discordapp.com/attachments/1380941495619686544/1418666675850711050/image.png?ex=68cef3cd&is=68cda24d&hm=31b1a398b06116bcff0ac083a94bcbed5231db5dbec193988ded1924be566610&" 
+       alt="Styliz3 Work Example">
 
-  app.innerHTML=`
-    <div class="card fade">
-      <div class="avatar">${user.slice(1,3).toUpperCase()}</div>
-      <h2>@${user}</h2>
-      <div class="msg">@${user} is here 🎉</div>
-      <p>Views: ${views}</p>
-      <div style="margin-top:12px">
-        <a href="/" style="color:#00ff90;text-decoration:none;font-weight:700">➕ Create your own</a>
-      </div>
-    </div>`;
-}
-// --- Homepage (/): generator ---
-else{
-  app.innerHTML=`
-    <div class="card fade">
-      <h1>PartyLinks</h1>
-      <p>Create a fun shareable link like <b>/@YourName</b></p>
-      <div class="input-row">
-        <input id="username" placeholder="Enter a name or tag" />
-        <button id="makeBtn">Create</button>
-      </div>
-      <div class="links" id="links"></div>
-    </div>`;
-  const btn=document.getElementById('makeBtn');
-  const input=document.getElementById('username');
-  const list=document.getElementById('links');
-  const storageKey='pl_recent';
-  const render=()=>{
-    const arr=JSON.parse(localStorage.getItem(storageKey)||'[]');
-    list.innerHTML=arr.map(u=>`<div><a href="/@${encodeURIComponent(u)}">/@${u}</a></div>`).join('')||'<i>No links yet</i>';
-  };
-  render();
-  btn.onclick=()=>{
-    const val=input.value.trim();
-    if(!val)return alert('Enter a name');
-    const arr=JSON.parse(localStorage.getItem(storageKey)||'[]');
-    arr.push(val); localStorage.setItem(storageKey,JSON.stringify(arr));
-    window.location.href='/@'+encodeURIComponent(val);
-  };
-}
-</script>
+  <!-- About / Q&A -->
+  <div class="faq">
+    <h2>About Me (Q&A)</h2>
+
+    <div class="faq-item">
+      <div class="faq-question">1. What type of UI do you focus on?</div>
+      <div class="faq-answer">I specialize in <b>simulator-style UI</b>. Even though it’s made for simulators, my UIs can be used in <b>any type of game</b>.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">2. What do you prefer designing?</div>
+      <div class="faq-answer">I enjoy creating <b>buttons, frames, and full game UIs</b>. I offer different pricing depending on the size of the project.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">3. What is your biggest strength?</div>
+      <div class="faq-answer">I’m <b>fast</b>, reliable, and always try to make my <b>customers happy</b> with polished designs delivered quickly.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">4. What are your goals?</div>
+      <div class="faq-answer">My goal is to earn <b>Robux</b> through UI design to help fund my own <b>future game projects</b>.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">5. Why should someone hire you?</div>
+      <div class="faq-answer">I bring <b>dedication, speed, and creativity</b>. I adapt my work to your game’s theme, ensuring the UI feels natural and professional.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">6. What tools do you use?</div>
+      <div class="faq-answer">I mainly use <b>Photoshop, Figma, and Roblox Studio</b> to design, polish, and implement UIs directly into games.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">7. How do you work with clients?</div>
+      <div class="faq-answer">I communicate actively on <b>Discord</b>, send progress updates, and always make sure my clients get exactly what they need.</div>
+    </div>
+
+  </div>
+
+  <!-- Contact -->
+  <div style="margin-top:50px;">
+    <h2>Contact Me</h2>
+    <p>Discord: <b>@styliz3</b> (User ID: 1181996641633435668)</p>
+    <p>Roblox: <a href="https://www.roblox.com/users/9224085670/profile" target="_blank">@Styliz3_22</a></p>
+    <p><i>Ask for more of my UI work in Discord DMs!</i></p>
+  </div>
+
+  <!-- Hire Me -->
+  <div style="margin-top:40px; border:1px solid white; padding:20px; display:inline-block;">
+    <h2>💼 Hire Me</h2>
+    <p>Looking for clean, simulator-style Roblox UI? Let’s work together!</p>
+  </div>
+
+  <script>
+    // Accordion toggle
+    document.querySelectorAll('.faq-question').forEach(q => {
+      q.addEventListener('click', () => {
+        q.classList.toggle('active');
+        const answer = q.nextElementSibling;
+        answer.style.display = (answer.style.display === "block") ? "none" : "block";
+      });
+    });
+  </script>
+
 </body>
 </html>
