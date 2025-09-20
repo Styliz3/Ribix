@@ -1,316 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Discord-style Mock Popout — Acknowledge to Export</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#050506;
-    --panel:#0b0b0c;
-    --muted:#9aa0a6;
-    --accent:#5865f2;
-    --surface:#161617;
-    --radius:12px;
-  }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#040405,#0b0b0c);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef6;display:flex;align-items:center;justify-content:center;padding:20px;}
-  .wrap{width:420px;max-width:95%}
-  .toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-  .toolbar .note{font-size:13px;color:var(--muted)}
-  .card{background:linear-gradient(180deg,#0b0b0c,#0b0b0c);border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.7);position:relative}
-  .banner{height:120px;background:#0e0e10;display:flex;align-items:center;justify-content:flex-start;padding:12px;gap:12px}
-  .banner-color{width:100%;height:100%;position:absolute;left:0;top:0}
-  .banner img{width:100%;height:100%;object-fit:cover;display:block}
-  .banner-controls{position:relative;z-index:2;display:flex;align-items:center;gap:8px}
-  .avatar{position:relative;margin-left:16px;margin-top:-38px;width:88px;height:88px;border-radius:50%;border:6px solid #0b0b0c;background:#222;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
-  .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-  .content{padding:14px 14px 18px}
-  .username{font-size:22px;font-weight:800;margin-top:2px}
-  .handle{color:var(--muted);margin-top:6px;font-size:14px}
-  .badges{display:inline-flex;gap:6px;margin-left:6px;vertical-align:middle}
-  .badge{width:20px;height:20px;border-radius:6px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:#1a1a1a}
-  .info-block{margin-top:12px;background:#0f1011;padding:10px;border-radius:10px}
-  .info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.02)}
-  .info-row:last-child{border-bottom:0}
-  .info-title{color:var(--muted);font-size:13px}
-  .info-value{font-weight:600}
-  .controls{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
-  input[type="text"], input[type="number"], input[type="date"], select{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:#0b0b0c;color:#e6eef6}
-  textarea{width:100%;padding:8px;border-radius:8px;background:#0b0b0c;color:#e6eef6;border:1px solid rgba(255,255,255,0.04)}
-  .row{display:flex;gap:8px}
-  button{padding:8px 12px;border-radius:8px;background:var(--accent);border:none;color:white;cursor:pointer}
-  .export-disabled{opacity:0.5;cursor:not-allowed}
-  .watermark{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:900;color:rgba(255,255,255,0.045);transform:rotate(-12deg);pointer-events:none}
-  .ribbon{position:absolute;right:12px;top:12px;background:rgba(255,0,0,0.12);color:#fff;padding:6px 10px;border-radius:8px;font-weight:700;font-size:12px;backdrop-filter: blur(4px)}
-  .ack{margin-top:10px;font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
-  .danger{color:#ffb5b5;font-size:13px;margin-top:6px}
-  input[type="file"]{color:transparent}
-  .small-hint{font-size:12px;color:var(--muted)}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Styliz3 | Roblox UI Designer</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 3em;
+      text-transform: uppercase;
+      -webkit-text-stroke: 1px white;
+      color: black;
+      margin-bottom: 10px;
+    }
+    h2, h3 {
+      margin: 20px 0;
+    }
+    img {
+      max-width: 90%;
+      border: 2px solid white;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    a {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid white;
+    }
+
+    /* Accordion Q&A */
+    .faq {
+      max-width: 800px;
+      margin: 40px auto;
+      text-align: left;
+    }
+    .faq-item {
+      border: 1px solid white;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .faq-question {
+      background: #111;
+      padding: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      position: relative;
+    }
+    .faq-question::after {
+      content: "+";
+      position: absolute;
+      right: 15px;
+    }
+    .faq-question.active::after {
+      content: "-";
+    }
+    .faq-answer {
+      display: none;
+      padding: 15px;
+      background: #000;
+      border-top: 1px solid white;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="toolbar">
-      <div class="note">Discord-style Mock Popout — <strong>SAFE MOCK</strong></div>
-      <div style="flex:1"></div>
-      <button id="applyBtn">Apply</button>
-      <button id="exportBtn" class="export-disabled" disabled>Export PNG</button>
+
+  <!-- Top Info -->
+  <h1>Styliz3</h1>
+  <h2>Roblox UI Designer</h2>
+  <p style="max-width:700px; margin:20px auto; font-size:1.1em; line-height:1.5;">
+    I design <b>simulator-style UIs</b> that are bold, clean, and engaging.  
+    My work fits <b>any type of game</b>, not just simulators.  
+    With <b>3 months of experience</b>, I focus on making UIs that players enjoy and developers can rely on.  
+  </p>
+
+  <!-- Work Showcase -->
+  <h3>My Work</h3>
+  <img src="https://cdn.discordapp.com/attachments/1380941495619686544/1418666675850711050/image.png?ex=68cef3cd&is=68cda24d&hm=31b1a398b06116bcff0ac083a94bcbed5231db5dbec193988ded1924be566610&" 
+       alt="Styliz3 Work Example">
+
+  <!-- About / Q&A -->
+  <div class="faq">
+    <h2>About Me (Q&A)</h2>
+
+    <div class="faq-item">
+      <div class="faq-question">1. What type of UI do you focus on?</div>
+      <div class="faq-answer">I specialize in <b>simulator-style UI</b>. Even though it’s made for simulators, my UIs can be used in <b>any type of game</b>.</div>
     </div>
 
-    <!-- Card preview -->
-    <div id="card" class="card" aria-label="mock card preview">
-      <div class="banner" id="banner">
-        <div id="bannerColor" class="banner-color" style="background:linear-gradient(90deg,#111 0,#0d0d0d 100%);"></div>
-        <img id="bannerImg" src="" alt="" style="display:none">
-        <div class="banner-controls" style="position:relative;z-index:2">
-          <!-- small faux icons to match compact look -->
-        </div>
-      </div>
-
-      <div style="padding:0 14px 10px;">
-        <div style="display:flex;align-items:flex-start;gap:12px;">
-          <div class="avatar" id="avatar">
-            <img id="avatarImg" src="" alt="" style="display:none">
-            <div id="avatarFallback" style="display:flex;align-items:center;justify-content:center;height:100%;color:#8b8b8b;font-weight:700">A</div>
-          </div>
-          <div style="flex:1;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div id="usernamePreview" class="username">nltroaddict</div>
-              <div class="badges" id="badgesPreview"></div>
-            </div>
-            <div id="handlePreview" class="handle">nltroaddict</div>
-          </div>
-        </div>
-
-        <div class="info-block" style="margin-top:12px;">
-          <div style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:8px">Member Since</div>
-          <div style="font-weight:700">Nov 30, 2021</div>
-        </div>
-
-        <div class="info-block" style="margin-top:10px;">
-          <div class="info-row">
-            <div>
-              <div class="info-title">Mutual Servers — 3</div>
-            </div>
-            <div style="color:var(--muted)">›</div>
-          </div>
-          <div class="info-row">
-            <div>
-              <div class="info-title">Mutual Friends — 1</div>
-            </div>
-            <div style="color:var(--muted)">›</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="watermark">MOCK</div>
-      <div class="ribbon">NOT REAL</div>
+    <div class="faq-item">
+      <div class="faq-question">2. What do you prefer designing?</div>
+      <div class="faq-answer">I enjoy creating <b>buttons, frames, and full game UIs</b>. I offer different pricing depending on the size of the project.</div>
     </div>
 
-    <!-- Controls -->
-    <div class="controls" style="margin-top:12px">
-      <div>
-        <label>Username</label>
-        <input id="username" type="text" value="nltroaddict">
-      </div>
-      <div>
-        <label>Handle (small)</label>
-        <input id="handle" type="text" value="nltroaddict">
-      </div>
+    <div class="faq-item">
+      <div class="faq-question">3. What is your biggest strength?</div>
+      <div class="faq-answer">I’m <b>fast</b>, reliable, and always try to make my <b>customers happy</b> with polished designs delivered quickly.</div>
+    </div>
 
-      <div class="row">
-        <div style="flex:1">
-          <label>Member Since</label>
-          <input id="memberSince" type="date" value="2021-11-30">
-        </div>
-        <div style="width:120px">
-          <label>Mutual Servers</label>
-          <input id="mutualServers" type="number" min="0" value="3">
-        </div>
-        <div style="width:120px">
-          <label>Mutual Friends</label>
-          <input id="mutualFriends" type="number" min="0" value="1">
-        </div>
-      </div>
+    <div class="faq-item">
+      <div class="faq-question">4. What are your goals?</div>
+      <div class="faq-answer">My goal is to earn <b>Robux</b> through UI design to help fund my own <b>future game projects</b>.</div>
+    </div>
 
-      <div>
-        <label>Badge image URLs (one per line)</label>
-        <textarea id="badgesUrls" placeholder="https://.../badge1.png\nhttps://.../badge2.png" rows="3"></textarea>
-        <div class="small-hint">Small square images work best.</div>
-      </div>
+    <div class="faq-item">
+      <div class="faq-question">5. Why should someone hire you?</div>
+      <div class="faq-answer">I bring <b>dedication, speed, and creativity</b>. I adapt my work to your game’s theme, ensuring the UI feels natural and professional.</div>
+    </div>
 
-      <div class="row">
-        <div style="flex:1">
-          <label>Upload avatar</label>
-          <input id="avatarFile" type="file" accept="image/*">
-        </div>
-        <div style="flex:1">
-          <label>Upload banner (image/GIF)</label>
-          <input id="bannerFile" type="file" accept="image/gif,image/*">
-        </div>
-      </div>
+    <div class="faq-item">
+      <div class="faq-question">6. What tools do you use?</div>
+      <div class="faq-answer">I mainly use <b>Photoshop, Figma, and Roblox Studio</b> to design, polish, and implement UIs directly into games.</div>
+    </div>
 
-      <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
-        <div style="flex:1">
-          <label>Or pick a solid banner color</label>
-          <input id="bannerColorInput" type="color" value="#0c0c0c" style="width:100%;height:36px;padding:2px;border-radius:6px;border:0;background:#000;">
-        </div>
-      </div>
-
-      <div class="ack">
-        <input id="ackCheckbox" type="checkbox" />
-        <div>
-          <div style="font-weight:700">I understand this mock tool is for harmless/prank/design use only.</div>
-          <div style="font-size:12px;color:var(--muted)">I will NOT use generated images/pages to impersonate, defraud, or harm anyone. I accept responsibility if misused.</div>
-        </div>
-      </div>
-
-      <div class="danger">Export is disabled until the acknowledgement checkbox is checked. The MOCK label is always present and cannot be removed.</div>
+    <div class="faq-item">
+      <div class="faq-question">7. How do you work with clients?</div>
+      <div class="faq-answer">I communicate actively on <b>Discord</b>, send progress updates, and always make sure my clients get exactly what they need.</div>
     </div>
 
   </div>
 
-  <!-- html2canvas -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- Contact -->
+  <div style="margin-top:50px;">
+    <h2>Contact Me</h2>
+    <p>Discord: <b>@styliz3</b> (User ID: 1181996641633435668)</p>
+    <p>Roblox: <a href="https://www.roblox.com/users/9224085670/profile" target="_blank">@Styliz3_22</a></p>
+    <p><i>Ask for more of my UI work in Discord DMs!</i></p>
+  </div>
+
+  <!-- Hire Me -->
+  <div style="margin-top:40px; border:1px solid white; padding:20px; display:inline-block;">
+    <h2>💼 Hire Me</h2>
+    <p>Looking for clean, simulator-style Roblox UI? Let’s work together!</p>
+  </div>
+
   <script>
-    // Elements
-    const username = document.getElementById('username');
-    const handle = document.getElementById('handle');
-    const usernamePreview = document.getElementById('usernamePreview');
-    const handlePreview = document.getElementById('handlePreview');
-    const memberSince = document.getElementById('memberSince');
-    const mutualServers = document.getElementById('mutualServers');
-    const mutualFriends = document.getElementById('mutualFriends');
-    const badgesUrls = document.getElementById('badgesUrls');
-    const badgesPreview = document.getElementById('badgesPreview');
-    const avatarFile = document.getElementById('avatarFile');
-    const bannerFile = document.getElementById('bannerFile');
-    const bannerImg = document.getElementById('bannerImg');
-    const bannerColorInput = document.getElementById('bannerColorInput');
-    const bannerColor = document.getElementById('bannerColor');
-    const avatarImg = document.getElementById('avatarImg');
-    const avatarFallback = document.getElementById('avatarFallback');
-    const applyBtn = document.getElementById('applyBtn');
-    const exportBtn = document.getElementById('exportBtn');
-    const ackCheckbox = document.getElementById('ackCheckbox');
-    const card = document.getElementById('card');
-
-    // apply function
-    function applyPreview(){
-      usernamePreview.textContent = username.value || 'Username';
-      handlePreview.textContent = handle.value || '';
-      // member since formatting
-      const d = new Date(memberSince.value);
-      if(memberSince.value){
-        const opts = { year: 'numeric', month: 'short', day: 'numeric' };
-        const text = d.toLocaleDateString(undefined, opts);
-        // place into the first info-block area
-        const block = card.querySelector('.info-block');
-        if(block){
-          block.querySelector('div[style]').textContent = text;
-          block.querySelector('div[style]').style.fontWeight = '700';
-        }
-      }
-      // mutuals
-      const rows = card.querySelectorAll('.info-row .info-title');
-      if(rows.length >= 2){
-        rows[0].textContent = 'Mutual Servers — ' + (mutualServers.value || '0');
-        rows[1].textContent = 'Mutual Friends — ' + (mutualFriends.value || '0');
-      }
-      // badges
-      badgesPreview.innerHTML = '';
-      const list = badgesUrls.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-      for(const url of list){
-        const b = document.createElement('div');
-        b.className = 'badge';
-        const img = document.createElement('img');
-        img.src = url;
-        img.style.maxWidth='100%';
-        img.style.maxHeight='100%';
-        img.onerror = ()=>{ img.style.display='none'; b.textContent='⚑'; }
-        b.appendChild(img);
-        badgesPreview.appendChild(b);
-      }
-    }
-
-    // file loaders
-    avatarFile.addEventListener('change', e=>{
-      const f = e.target.files && e.target.files[0];
-      if(!f) return;
-      const reader = new FileReader();
-      reader.onload = ev=>{
-        avatarImg.src = ev.target.result;
-        avatarImg.style.display = 'block';
-        avatarFallback.style.display = 'none';
-      };
-      reader.readAsDataURL(f);
-    });
-    bannerFile.addEventListener('change', e=>{
-      const f = e.target.files && e.target.files[0];
-      if(!f) return;
-      const reader = new FileReader();
-      reader.onload = ev=>{
-        bannerImg.src = ev.target.result;
-        bannerImg.style.display = 'block';
-        bannerColor.style.display = 'none';
-      };
-      reader.readAsDataURL(f);
-    });
-
-    // banner color
-    bannerColorInput.addEventListener('input', e=>{
-      bannerColor.style.background = e.target.value;
-      bannerImg.style.display = 'none';
-      bannerColor.style.display = 'block';
-    });
-
-    // acknowledgement toggles export
-    ackCheckbox.addEventListener('change', ()=>{
-      if(ackCheckbox.checked){
-        exportBtn.disabled = false;
-        exportBtn.classList.remove('export-disabled');
-      } else {
-        exportBtn.disabled = true;
-        exportBtn.classList.add('export-disabled');
-      }
-    });
-
-    // apply and live updates
-    applyBtn.addEventListener('click', applyPreview);
-    [username, handle, memberSince, mutualServers, mutualFriends, badgesUrls].forEach(el=>{
-      el.addEventListener('input', applyPreview);
-    });
-
-    // export (requires ack)
-    exportBtn.addEventListener('click', ()=>{
-      if(!ackCheckbox.checked){
-        alert('You must check the acknowledgement box before exporting. The resulting image will include a MOCK watermark and NOT REAL ribbon.');
-        return;
-      }
-      // scale for high resolution
-      html2canvas(card, {backgroundColor: null, scale: 3}).then(canvas=>{
-        const url = canvas.toDataURL('image/png');
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = (username.value || 'mock-profile') + '-mock.png';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      }).catch(err=>{
-        alert('Export failed: ' + err);
+    // Accordion toggle
+    document.querySelectorAll('.faq-question').forEach(q => {
+      q.addEventListener('click', () => {
+        q.classList.toggle('active');
+        const answer = q.nextElementSibling;
+        answer.style.display = (answer.style.display === "block") ? "none" : "block";
       });
     });
-
-    // init
-    // set member since preview initial
-    document.addEventListener('DOMContentLoaded', ()=>{
-      // set initial member since text (fills the first info-block)
-      applyPreview();
-      bannerColor.style.display = 'block';
-      bannerImg.style.display = 'none';
-    });
   </script>
+
 </body>
 </html>
