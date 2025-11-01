@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>KeySpend — Creator gates & verified links</title>
+<style>
+  /* ========== Root & reset ========== */
+  :root{
+    --bg:#061021;
+    --card:#0e1720;
+    --muted:#98a6b3;
+    --accent1:#7c3aed;
+    --accent2:#f59e0b;
+    --glass: rgba(255,255,255,0.03);
+    --success:#16a34a;
+    --danger:#ef4444;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#030511,var(--bg));font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:#e6eef6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent2);text-decoration:none}
+  .container{max-width:1100px;margin:28px auto;padding:20px;display:flex;flex-direction:column;gap:18px}
+
+  /* ========== Header ========== */
+  header{display:flex;align-items:center;gap:16px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{
+    width:56px;height:56px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#031022;font-size:18px;box-shadow:0 8px 30px rgba(124,58,237,0.12);
+  }
+  .brand h1{margin:0;font-size:18px}
+  .brand p{margin:0;color:var(--muted);font-size:13px}
+
+  .header-actions{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;color:#071022;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(2,6,23,0.6);transition:transform .12s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);box-shadow:none}
+
+  /* ========== Layout ========== */
+  .layout{display:grid;grid-template-columns:1fr 360px;gap:18px}
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 8px 40px rgba(2,6,23,0.6)}
+  .muted{color:var(--muted);font-size:13px}
+  .flex{display:flex;gap:12px;align-items:center}
+  .profile-pic{width:84px;height:84px;border-radius:12px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px}
+  .small{font-size:13px;color:var(--muted)}
+
+  /* ========== Forms ========== */
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+  input,select,textarea{width:100%;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
+  .field{margin-bottom:12px}
+
+  /* ========== Keys list ========== */
+  .keys-list{display:flex;flex-direction:column;gap:10px}
+  .key-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))}
+  .key-meta{display:flex;flex-direction:column;gap:6px}
+  .key-link{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px}
+
+  /* ========== Create key view ========== */
+  .create-wrap{display:flex;gap:18px}
+  .side{width:34%;min-width:220px}
+  .main{flex:1}
+
+  /* ========== Verification modal ========== */
+  .modal-backdrop{position:fixed;inset:0;background:linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.55));display:flex;align-items:center;justify-content:center;z-index:50}
+  .modal{width:920px;max-width:95%;border-radius:16px;padding:20px;background:linear-gradient(180deg,#021425,#071a2a);box-shadow:0 40px 120px rgba(2,6,23,0.7)}
+  .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2));width:0%;transition:width .6s cubic-bezier(.2,.9,.2,1)}
+  .center{display:flex;align-items:center;justify-content:center}
+
+  /* ========== Misc ========== */
+  footer{color:var(--muted);text-align:center;margin-top:8px}
+  .hint{font-size:13px;color:var(--muted);margin-top:8px}
+  @media (max-width:980px){.layout{grid-template-columns:1fr}.side{display:none}}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="flex">
+      <div class="brand">
+        <div class="logo">KS</div>
+        <div>
+          <h1>KeySpend</h1>
+          <p>Creator-gated links & secure downloads</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btnCreate" class="btn">Create Key</button>
+        <button id="btnLogin" class="btn ghost">Login</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="card" id="mainCard">
+        <!-- dynamic content injected by JS -->
+      </section>
+
+      <aside class="card">
+        <div class="flex" style="justify-content:space-between;align-items:center">
+          <div class="flex">
+            <div id="sidebarPfp" class="profile-pic">KS</div>
+            <div style="margin-left:8px">
+              <div id="sidebarUser" style="font-weight:800">Not signed in</div>
+              <div id="sidebarBday" class="small">—</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="small">Your Keys</div>
+            <div id="keysBrief" class="small muted">Nothing yet</div>
+          </div>
+        </div>
+
+        <hr style="margin:12px 0;border:0;height:1px;background:rgba(255,255,255,0.03)">
+
+        <div id="sidebarKeys" class="keys-list">
+          <div class="center small muted">Nothing here yet..<div style="font-size:28px;margin-top:6px">🔑</div></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div class="small">Lightweight front-end — connect to your Vercel Edge API. Use Vercel Postgres (free tier) or Neon for DB.</div>
+    </footer>
+  </div>
+
+  <!-- Modal container (hidden until used) -->
+  <div id="modalRoot" style="display:none"></div>
+
+<script>
+/* =========================
+   Configuration
+   ========================= */
+const API_BASE = ''; // empty means same origin: /api/...
+// If your backend is on another domain, set it here, e.g. "https://api.keyspend.app"
+
+/* =========================
+   Tiny DOM helpers
+   ========================= */
+const el = (html) => { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; };
+const $ = (s) => document.querySelector(s);
+
+/* =========================
+   Application state
+   ========================= */
+let currentUser = null;
+let cachedKeys = [];
+
+/* =========================
+   Init
+   ========================= */
+document.getElementById('btnLogin').addEventListener('click', showLogin);
+document.getElementById('btnCreate').addEventListener('click', () => {
+  if (!currentUser) return showLogin();
+  showCreateKey();
+});
+
+async function init() {
+  await tryLoadProfile();
+  if (!currentUser) showLanding();
+  else showDashboard();
+}
+init();
+
+/* =========================
+   UI screens
+   ========================= */
+function showLanding() {
+  const html = `
+    <div>
+      <h2 style="margin-top:0">Welcome to KeySpend</h2>
+      <p class="muted">Gate downloads or redirects with multi-step verification. Great for creators selling or distributing digital content.</p>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button id="ctaSign" class="btn">Sign Up</button>
+        <button id="ctaLogin" class="btn ghost">Login</button>
+      </div>
+      <div class="hint">Try signing up and create a new key to see how verification flows look</div>
+    </div>
+  `;
+  $('#mainCard').innerHTML = '';
+  $('#mainCard').appendChild(el(html));
+  $('#ctaSign').addEventListener('click', showSignup);
+  $('#ctaLogin').addEventListener('click', showLogin);
+}
+
+function showSignup() {
+  const html = `
+    <div>
+      <h3>Create account</h3>
+      <div class="field"><label>Username</label><input id="suUser" placeholder="your username"></div>
+      <div class="field"><label>Birthday</label><input id="suBday" type="date"></div>
+      <div class="field"><label>Password</label><input id="suPass" type="password" placeholder="strong password"></div>
+      <div style="display:flex;gap:8px"><button id="suCreate" class="btn">Create account</button><button id="suCancel" class="btn ghost">Cancel</button></div>
+      <div class="hint">We recommend using Vercel Postgres for persistent storage. Ask me for SQL migration.</div>
+    </div>
+  `;
+  $('#mainCard').innerHTML = '';
+  $('#mainCard').appendChild(el(html));
+  $('#suCreate').addEventListener('click', async () => {
+    const username = $('#suUser').value.trim();
+    const bday = $('#suBday').value;
+    const pass = $('#suPass').value;
+    if (!username || !pass) return alert('Username and password required');
+    try {
+      const res = await fetch(API_BASE + '/api/keyspend/signup', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, birthday: bday, password: pass })
+      });
+      const j = await res.json();
+      if (j.ok) { await tryLoadProfile(); showDashboard(); } else alert(j.error || 'Signup failed');
+    } catch (e) { alert('Network error'); console.error(e); }
+  });
+  $('#suCancel').addEventListener('click', showLanding);
+}
+
+function showLogin() {
+  const html = `
+    <div>
+      <h3>Login</h3>
+      <div class="field"><label>Username</label><input id="liUser" placeholder="username"></div>
+      <div class="field"><label>Password</label><input id="liPass" type="password" placeholder="password"></div>
+      <div style="display:flex;gap:8px"><button id="liGo" class="btn">Login</button><button id="liCancel" class="btn ghost">Cancel</button></div>
+    </div>
+  `;
+  $('#mainCard').innerHTML = '';
+  $('#mainCard').appendChild(el(html));
+  $('#liGo').addEventListener('click', async () => {
+    const username = $('#liUser').value.trim(), pass = $('#liPass').value;
+    if (!username || !pass) return alert('Enter username + password');
+    try {
+      const res = await fetch(API_BASE + '/api/keyspend/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password: pass })
+      });
+      const j = await res.json();
+      if (j.ok) {
+        // store session token (if backend returns session token)
+        if (j.session) localStorage.setItem('ks_session', j.session);
+        await tryLoadProfile();
+        showDashboard();
+      } else alert(j.error || 'Login failed');
+    } catch (e) { alert('Network error'); console.error(e); }
+  });
+  $('#liCancel').addEventListener('click', showLanding);
+}
+
+function showDashboard() {
+  $('#mainCard').innerHTML = '';
+  const html = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <h3 style="margin:0">${escape(currentUser.username)}</h3>
+        <div class="small muted">Birthday: ${escape(currentUser.birthday || '—')}</div>
+      </div>
+      <div>
+        <button id="btnNewKey" class="btn">Create New Key</button>
+        <button id="btnLogout" class="btn ghost">Logout</button>
+      </div>
+    </div>
+
+    <div style="margin-top:18px">
+      <h4 style="margin-bottom:8px">Your Keys</h4>
+      <div id="mainKeys" class="keys-list"></div>
+    </div>
+  `;
+  $('#mainCard').appendChild(el(html));
+  $('#btnNewKey').addEventListener('click', showCreateKey);
+  $('#btnLogout').addEventListener('click', async () => {
+    localStorage.removeItem('ks_session'); currentUser = null; await fetch(API_BASE + '/api/keyspend/logout', { method: 'POST' }); showLanding(); updateSidebar();
+  });
+
+  refreshKeysList();
+}
+
+function showCreateKey() {
+  $('#mainCard').innerHTML = '';
+  const html = `
+    <div class="create-wrap">
+      <div class="side card">
+        <h4>Creating Key</h4>
+        <div class="small muted">Create your key here! Configure verification steps and completion action. This left panel shows a summary.</div>
+        <div id="createSummary" style="margin-top:12px" class="small muted"></div>
+      </div>
+
+      <div class="main card">
+        <h4>Key creation</h4>
+        <div class="field"><label>Key name</label><input id="kName" placeholder="My special key"></div>
+        <div class="field"><label>Checkpoints (1-10)</label><input id="kSteps" type="number" min="1" max="10" value="3"></div>
+        <div class="field"><label>Wait time before click (seconds)</label><input id="kWait" type="number" min="0" max="120" value="15"></div>
+        <div class="field"><label>Completion action</label><select id="kAction"><option value="open">Open URL</option><option value="download">Download file</option></select><input id="kActionVal" placeholder="Redirect URL or file key" style="margin-top:8px"></div>
+        <div style="display:flex;gap:8px"><button id="kCreate" class="btn">Create key</button><button id="kCancel" class="btn ghost">Cancel</button></div>
+      </div>
+    </div>
+  `;
+  $('#mainCard').appendChild(el(html));
+  $('#kCancel').addEventListener('click', showDashboard);
+  $('#kCreate').addEventListener('click', async () => {
+    const name = $('#kName').value.trim();
+    const steps = Number($('#kSteps').value) || 1;
+    const wait = Number($('#kWait').value) || 15;
+    const action = $('#kAction').value;
+    const value = $('#kActionVal').value.trim();
+    if (!name) return alert('Key name required');
+    try {
+      const body = { name, steps, wait, action, value };
+      const res = await authedFetch('/api/keyspend/create-key', { method: 'POST', json: body });
+      const j = await res.json();
+      if (j.ok) { alert('Key created'); await refreshKeysList(); showDashboard(); } else alert(j.error || 'Create failed');
+    } catch (e) { alert('Network error'); console.error(e); }
+  });
+}
+
+/* =========================
+   Keys list + helper UI
+   ========================= */
+async function refreshKeysList() {
+  const res = await authedFetch('/api/keyspend/keys', { method: 'GET' });
+  if (res.status === 401) { localStorage.removeItem('ks_session'); currentUser = null; updateSidebar(); showLanding(); return; }
+  const j = await res.json();
+  cachedKeys = j.keys || [];
+  const wrap = $('#mainKeys') || $('#sidebarKeys');
+  if (wrap) {
+    const mainKeys = $('#mainKeys') || el('<div id="mainKeys"></div>');
+    mainKeys.innerHTML = '';
+    if (cachedKeys.length === 0) {
+      mainKeys.innerHTML = '<div class="small muted">No keys yet</div>';
+      $('#sidebarKeys').innerHTML = '<div class="center small muted">Nothing here yet.. <div style="font-size:28px;margin-top:8px">🔑</div></div>';
+      $('#keysBrief').innerText = '0';
+    } else {
+      $('#keysBrief').innerText = String(cachedKeys.length);
+      $('#sidebarKeys').innerHTML = '';
+      cachedKeys.forEach(k => {
+        const node = el(`<div class="key-item">
+          <div class="key-meta">
+            <div style="font-weight:700">${escape(k.name)}</div>
+            <div class="key-link">${escape(k.public_link)}</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost" data-link="${escape(k.public_link)}" data-name="${escape(k.name)}">Open</button>
+          </div>
+        </div>`);
+        node.querySelector('.btn.ghost').addEventListener('click', () => window.open(k.public_link, '_blank'));
+        $('#sidebarKeys').appendChild(node.cloneNode(true));
+        mainKeys.appendChild(node);
+      });
+    }
+    if (!$('#mainKeys')) $('#mainCard').appendChild(mainKeys);
+  }
+}
+
+/* =========================
+   Verification modal (client simulation)
+   ========================= */
+function openVerifyModal(link) {
+  // show progress + simulated steps
+  const token = link.split('/').pop();
+  const root = $('#modalRoot');
+  root.innerHTML = '';
+  root.style.display = 'block';
+  const modal = el(`
+    <div class="modal-backdrop">
+      <div class="modal">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><h3 style="margin:0">Verification</h3><div class="small muted">Link: ${escape(link)}</div></div>
+          <div><button id="closeModal" class="btn ghost">Close</button></div>
+        </div>
+        <hr style="margin:12px 0;border:0;height:1px;background:rgba(255,255,255,0.03)"/>
+        <div style="display:flex;gap:18px">
+          <div style="flex:1">
+            <div class="small muted">Progress</div>
+            <div style="height:12px"></div>
+            <div class="progress"><i id="progBar"></i></div>
+            <div style="height:16px"></div>
+            <div id="stepText" class="small muted">Starting...</div>
+            <div style="height:12px"></div>
+            <div id="stepControl" class="center"></div>
+          </div>
+          <div style="width:260px" class="card">
+            <div style="font-weight:700">Creator</div>
+            <div class="small muted">Name & profile shown here</div>
+            <div style="height:10px"></div>
+            <div style="font-size:12px;color:var(--muted)">Verification steps will ensure tasks are completed before revealing the action.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `);
+  root.appendChild(modal);
+
+  document.getElementById('closeModal').addEventListener('click', () => { root.style.display='none'; root.innerHTML=''; });
+
+  // fetch key meta (server may provide steps)
+  (async function runSimulation() {
+    try {
+      const res = await fetch(link);
+      // we don't parse the page here; instead simulate steps with nice UX
+    } catch (e) { console.warn('open verify fetch failed', e); }
+
+    const prog = $('#progBar');
+    const stepText = $('#stepText');
+    const stepControl = $('#stepControl');
+    let pct = 0;
+    const steps = 3;
+    let step = 0;
+
+    const nextStep = () => {
+      step++;
+      stepText.innerText = `Step ${step} of ${steps} — perform the required action`;
+      stepControl.innerHTML = `<button id="doStep" class="btn">Simulate action</button>`;
+      document.getElementById('doStep').onclick = async () => {
+        stepControl.innerHTML = `<div class="small muted">Verifying...</div>`;
+        await new Promise(r => setTimeout(r, 1000 + Math.random()*1200));
+        pct += Math.floor(100/steps);
+        prog.style.width = pct + '%';
+        stepControl.innerHTML = `<div class="small" style="color:var(--success)">Step ${step} verified</div>`;
+        if (step < steps) setTimeout(nextStep, 900);
+        else {
+          stepText.innerHTML = `All steps complete — reveal action`;
+          stepControl.innerHTML = `<button id="reveal" class="btn">${Math.random()>.5 ? 'Open Link' : 'Download'}</button>`;
+          document.getElementById('reveal').onclick = () => { window.open(link, '_blank'); root.style.display='none'; root.innerHTML=''; };
+        }
+      };
+    };
+
+    // initial wait UI
+    stepText.innerText = `Initial wait — preparing verification`;
+    stepControl.innerHTML = `<div class="small muted">Please wait...</div>`;
+    const initialDelay = 900 + Math.random()*900;
+    setTimeout(nextStep, initialDelay);
+  })();
+}
+
+/* =========================
+   Networking helpers
+   ========================= */
+function getSession() { return localStorage.getItem('ks_session'); }
+async function authedFetch(path, opts = {}) {
+  const headers = new Headers(opts.headers || {});
+  const session = getSession();
+  if (session) headers.set('Authorization', session);
+  if (opts.json) {
+    headers.set('Content-Type','application/json');
+    opts.body = JSON.stringify(opts.json);
+  }
+  return fetch(API_BASE + path, { ...opts, headers });
+}
+
+async function tryLoadProfile() {
+  const session = getSession();
+  if (!session) { currentUser = null; updateSidebar(); return; }
+  try {
+    const res = await authedFetch('/api/keyspend/profile', { method: 'GET' });
+    if (res.status !== 200) { currentUser = null; updateSidebar(); return; }
+    const j = await res.json();
+    currentUser = { username: j.username, birthday: j.birthday, pfp: j.pfp || null };
+    updateSidebar();
+  } catch (e) { console.error('profile load failed', e); currentUser = null; updateSidebar(); }
+}
+
+function updateSidebar() {
+  if (!currentUser) {
+    $('#sidebarUser').innerText = 'Not signed in';
+    $('#sidebarBday').innerText = '—';
+    $('#sidebarPfp').innerText = 'KS';
+    $('#btnLogin').style.display = 'inline-block';
+  } else {
+    $('#sidebarUser').innerText = currentUser.username;
+    $('#sidebarBday').innerText = currentUser.birthday || '—';
+    if (currentUser.pfp) $('#sidebarPfp').innerHTML = `<img src="${currentUser.pfp}" style="width:100%;height:100%;object-fit:cover;border-radius:12px" />`;
+    else $('#sidebarPfp').innerText = currentUser.username.slice(0,2).toUpperCase();
+    $('#btnLogin').style.display = 'none';
+  }
+}
+
+/* =========================
+   Utilities
+   ========================= */
+function escape(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+window.escape = escape;
+
+/* expose verify for demo usage (open small simulation modal) */
+window.openVerifyModal = openVerifyModal;
+
+</script>
+</body>
+</html>
